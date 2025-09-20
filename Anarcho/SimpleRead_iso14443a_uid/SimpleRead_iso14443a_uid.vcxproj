@@ -78,8 +78,12 @@
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="NdefHelper.cpp">
+      <FileType>CppCode</FileType>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="NdefHelper.h" />
     <ClInclude Include="__vm\.SimpleRead_iso14443a_uid.vsarduino.h" />
   </ItemGroup>
   <PropertyGroup>

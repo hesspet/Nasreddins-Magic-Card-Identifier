@@ -16,8 +16,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="SimpleRead_iso14443a_uid.ino" />
+    <ClCompile Include="NdefHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="NdefHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="__vm\.SimpleRead_iso14443a_uid.vsarduino.h">
       <Filter>Header Files</Filter>
     </ClInclude>
