@@ -71,10 +71,10 @@ void loop() {
 	uint8_t uid[kUidBufferMax] = { 0 };
 	uint8_t uidLength = 0;
 
-        if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
-                bool newTagDetected = (!tagPresent) ||
-                        (uidLength != lastUidLength) ||
-                        (!Type2TagReader::isSameUid(uid, lastUid, uidLength));
+	if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
+		bool newTagDetected = (!tagPresent) ||
+			(uidLength != lastUidLength) ||
+			(!Type2TagReader::isSameUid(uid, lastUid, uidLength));
 
 		if (newTagDetected) {
 			tagPresent = true;
@@ -85,9 +85,9 @@ void loop() {
 			Serial.println(uidLength);
 			Serial.print(F("UID: ")); nfc.PrintHex(uid, uidLength);
 
-                        // --- 1) CC lesen & interpretieren ---
-                        Type2TagReader::TagInfo ti{};
-                        if (!tagReader.readCapabilityContainer(ti)) {
+			// --- 1) CC lesen & interpretieren ---
+			Type2TagReader::TagInfo ti{};
+			if (!tagReader.readCapabilityContainer(ti)) {
 				Serial.println(F("Failed to read Capability Container (page 3)"));
 				return;
 			}
@@ -107,8 +107,8 @@ void loop() {
 			Serial.println(ti.probableType);
 
 			// --- 2) User Memory vollständig lesen (dynamisch) ---
-                        static uint8_t user[kUserMaxBytes];
-                        if (!tagReader.readUserMemory(user, sizeof(user), ti)) {
+			static uint8_t user[kUserMaxBytes];
+			if (!tagReader.readUserMemory(user, sizeof(user), ti)) {
 				Serial.println(F("Failed to read user memory"));
 				return;
 			}

@@ -19,12 +19,18 @@
     <ClCompile Include="NdefHelper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Type2TagReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NdefHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="__vm\.SimpleRead_iso14443a_uid.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type2TagReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
