@@ -81,9 +81,13 @@
     <ClCompile Include="NdefHelper.cpp">
       <FileType>CppCode</FileType>
     </ClCompile>
+    <ClCompile Include="Type2TagReader.cpp">
+      <FileType>CppCode</FileType>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="NdefHelper.h" />
+    <ClInclude Include="Type2TagReader.h" />
     <ClInclude Include="__vm\.SimpleRead_iso14443a_uid.vsarduino.h" />
   </ItemGroup>
   <PropertyGroup>
