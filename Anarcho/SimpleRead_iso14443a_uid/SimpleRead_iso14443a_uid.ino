@@ -19,6 +19,7 @@
 #include <string.h>
 
 #include "NdefHelper.h"
+#include "Type2TagReader.h"
 
 #define PN532_HSU_PORT   Serial2
 static const uint32_t PN532_HSU_BAUDRATE = 115200;
@@ -27,73 +28,12 @@ static const int      PN532_HSU_TX_PIN = 25;  // ESP32 TX  (an PN532 RX)
 
 static PN532_HSU pn532hsu(PN532_HSU_PORT);
 static PN532     nfc(pn532hsu);
+static Type2TagReader tagReader(nfc);
 
 constexpr uint8_t  kUidBufferMax = 10;    // 4/7/10 Byte UIDs
 constexpr uint16_t kUserMaxBytes = 1024;  // reicht für NTAG216 (888 B)
-constexpr uint8_t  kBytesPerPage = 4;
-constexpr uint8_t  kFirstUserPage = 4;
 
 static NdefHelper ndefHelper;
-
-struct Type2TagInfo {
-	bool     ccValid = false;
-	uint8_t  ccMagic = 0x00;   // 0xE1 erwartet
-	uint8_t  verMaj = 0;
-	uint8_t  verMin = 0;
-	uint8_t  size8 = 0;      // Anzahl 8-Byte-Blöcke
-	uint8_t  access = 0;      // 0x00 meist RW, 0x0F RO
-	uint16_t userBytes = 0;    // size8 * 8
-	uint16_t userPages = 0;    // userBytes / 4
-	const char* probableType = "Unknown Type 2";
-};
-
-bool isSameUid(const uint8_t* lhs, const uint8_t* rhs, uint8_t len) {
-	return lhs && rhs && (memcmp(lhs, rhs, len) == 0);
-}
-
-/* ---------- CC lesen (Page 3) und Type2TagInfo ableiten ---------- */
-bool readCapabilityContainer(Type2TagInfo& out) {
-	uint8_t page3[4] = { 0 };
-	if (!nfc.mifareultralight_ReadPage(3, page3)) {
-		return false;
-	}
-	out.ccMagic = page3[0];
-	out.verMaj = (page3[1] >> 4) & 0x0F;
-	out.verMin = page3[1] & 0x0F;
-	out.size8 = page3[2];
-	out.access = page3[3];
-
-	out.ccValid = (out.ccMagic == 0xE1); // NDEF-kompatibel
-
-	out.userBytes = (uint16_t)out.size8 * 8u;
-	out.userPages = out.userBytes / kBytesPerPage;
-
-	// Heuristik zur Typ-Benennung per Data Area Size
-	// (häufige Werte – Hersteller-Varianten möglich)
-	switch (out.size8) {
-	case 0x06: out.probableType = "MIFARE Ultralight (48 B user)"; break;   // 48 B
-	case 0x0C: out.probableType = "MIFARE Ultralight C (96 B user)"; break; // 96 B
-	case 0x12: out.probableType = "NTAG213 (144 B user)"; break;            // 144 B
-	case 0x3F: out.probableType = "NTAG215 (504 B user)"; break;            // 504 B
-	case 0x6F: out.probableType = "NTAG216 (888 B user)"; break;            // 888 B
-	default:   out.probableType = "Type 2 (unknown capacity)"; break;
-	}
-	return true;
-}
-
-/* ---------- Gesamten User-Memory lesen (ab Page 4) ---------- */
-bool readUserMemoryDynamic(uint8_t* buffer, size_t bufferCap, const Type2TagInfo& ti) {
-	if (!buffer || ti.userBytes == 0) return false;
-	if (ti.userBytes > bufferCap)     return false;
-
-	for (uint16_t i = 0; i < ti.userPages; ++i) {
-		if (!nfc.mifareultralight_ReadPage(kFirstUserPage + i,
-			buffer + i * kBytesPerPage)) {
-			return false;
-		}
-	}
-	return true;
-}
 
 void setup() {
 	Serial.begin(115200);
@@ -131,10 +71,10 @@ void loop() {
 	uint8_t uid[kUidBufferMax] = { 0 };
 	uint8_t uidLength = 0;
 
-	if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
-		bool newTagDetected = (!tagPresent) ||
-			(uidLength != lastUidLength) ||
-			(!isSameUid(uid, lastUid, uidLength));
+        if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
+                bool newTagDetected = (!tagPresent) ||
+                        (uidLength != lastUidLength) ||
+                        (!Type2TagReader::isSameUid(uid, lastUid, uidLength));
 
 		if (newTagDetected) {
 			tagPresent = true;
@@ -145,9 +85,9 @@ void loop() {
 			Serial.println(uidLength);
 			Serial.print(F("UID: ")); nfc.PrintHex(uid, uidLength);
 
-			// --- 1) CC lesen & interpretieren ---
-			Type2TagInfo ti{};
-			if (!readCapabilityContainer(ti)) {
+                        // --- 1) CC lesen & interpretieren ---
+                        Type2TagReader::TagInfo ti{};
+                        if (!tagReader.readCapabilityContainer(ti)) {
 				Serial.println(F("Failed to read Capability Container (page 3)"));
 				return;
 			}
@@ -167,8 +107,8 @@ void loop() {
 			Serial.println(ti.probableType);
 
 			// --- 2) User Memory vollständig lesen (dynamisch) ---
-			static uint8_t user[kUserMaxBytes];
-			if (!readUserMemoryDynamic(user, sizeof(user), ti)) {
+                        static uint8_t user[kUserMaxBytes];
+                        if (!tagReader.readUserMemory(user, sizeof(user), ti)) {
 				Serial.println(F("Failed to read user memory"));
 				return;
 			}
