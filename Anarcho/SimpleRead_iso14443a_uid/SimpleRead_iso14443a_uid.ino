@@ -37,24 +37,24 @@ namespace {
 
         static NdefHelper ndefHelper;
 
-	struct TagInfo {
-		bool     ccValid = false;
-		uint8_t  ccMagic = 0x00;   // 0xE1 erwartet
-		uint8_t  verMaj = 0;
-		uint8_t  verMin = 0;
-		uint8_t  size8 = 0;      // Anzahl 8-Byte-Blöcke
+        struct Type2TagInfo {
+                bool     ccValid = false;
+                uint8_t  ccMagic = 0x00;   // 0xE1 erwartet
+                uint8_t  verMaj = 0;
+                uint8_t  verMin = 0;
+                uint8_t  size8 = 0;      // Anzahl 8-Byte-Blöcke
 		uint8_t  access = 0;      // 0x00 meist RW, 0x0F RO
 		uint16_t userBytes = 0;    // size8 * 8
 		uint16_t userPages = 0;    // userBytes / 4
-		const char* probableType = "Unknown Type 2";
-	};
+                const char* probableType = "Unknown Type 2";
+        };
 
         bool isSameUid(const uint8_t* lhs, const uint8_t* rhs, uint8_t len) {
                 return lhs && rhs && (memcmp(lhs, rhs, len) == 0);
         }
 
-	/* ---------- CC lesen (Page 3) und TagInfo ableiten ---------- */
-	bool readCapabilityContainer(TagInfo& out) {
+        /* ---------- CC lesen (Page 3) und Type2TagInfo ableiten ---------- */
+        bool readCapabilityContainer(Type2TagInfo& out) {
 		uint8_t page3[4] = { 0 };
 		if (!nfc.mifareultralight_ReadPage(3, page3)) {
 			return false;
@@ -84,7 +84,7 @@ namespace {
 	}
 
 	/* ---------- Gesamten User-Memory lesen (ab Page 4) ---------- */
-	bool readUserMemoryDynamic(uint8_t* buffer, size_t bufferCap, const TagInfo& ti) {
+        bool readUserMemoryDynamic(uint8_t* buffer, size_t bufferCap, const Type2TagInfo& ti) {
 		if (!buffer || ti.userBytes == 0) return false;
 		if (ti.userBytes > bufferCap)     return false;
 
@@ -150,8 +150,8 @@ void loop() {
 			Serial.println(uidLength);
 			Serial.print(F("UID: ")); nfc.PrintHex(uid, uidLength);
 
-			// --- 1) CC lesen & interpretieren ---
-			TagInfo ti{};
+                        // --- 1) CC lesen & interpretieren ---
+                        Type2TagInfo ti{};
 			if (!readCapabilityContainer(ti)) {
 				Serial.println(F("Failed to read Capability Container (page 3)"));
 				return;
