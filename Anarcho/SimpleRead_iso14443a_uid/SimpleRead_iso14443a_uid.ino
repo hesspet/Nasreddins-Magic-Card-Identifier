@@ -1,8 +1,16 @@
 ﻿/**************************************************************************/
 /*!
   ESP32 T-Display + PN532 (HSU/UART)
-  Liest NTAG213-User-Memory (Pages 4..39), parst TLV + NDEF,
-  dekodiert Text-Record (RTD/T) oder MIME-Record und gibt Inhalt aus.
+  Erkennung von Type-2-Tag via Capability Container (Page 3),
+  dynamisches Lesen des gesamten User-Memory (ab Page 4),
+  TLV-Parsing, NDEF-Parsing (erster Record) optional Textausgabe.
+
+  Verkabelung (HSU/UART):
+	ESP32 TX (GPIO 25) → PN532 RX
+	ESP32 RX (GPIO 26) → PN532 TX
+	3,3V Pegel, PN532 auf HSU/UART gestellt
+
+  Serielle Ausgabe: 115200 Baud
 */
 /**************************************************************************/
 
@@ -11,7 +19,6 @@
 #include <ctype.h>
 #include <string.h>
 
-// --- PN532 an Serial2 (HSU) ---
 #define PN532_HSU_PORT   Serial2
 static const uint32_t PN532_HSU_BAUDRATE = 115200;
 static const int      PN532_HSU_RX_PIN = 26;  // ESP32 RX  (an PN532 TX)
@@ -22,350 +29,328 @@ static PN532     nfc(pn532hsu);
 
 namespace {
 
-    // NTAG213: User-Memory pages 4..39 (36 Seiten) → 144 Bytes
-    constexpr uint8_t kFirstUserPage = 4;
-    constexpr uint8_t kUserPageCount = 36;
-    constexpr uint8_t kBytesPerPage = 4;
-    constexpr size_t  kUserBytes = kUserPageCount * kBytesPerPage; // 144 Bytes
+	constexpr uint8_t  kUidBufferMax = 10;    // 4/7/10 Byte UIDs
+	constexpr uint16_t kUserMaxBytes = 1024;  // reicht für NTAG216 (888 B)
+	constexpr uint8_t  kBytesPerPage = 4;
+	constexpr uint8_t  kFirstUserPage = 4;
 
-    constexpr uint8_t kUidBufferMax = 10;
+	struct TagInfo {
+		bool     ccValid = false;
+		uint8_t  ccMagic = 0x00;   // 0xE1 erwartet
+		uint8_t  verMaj = 0;
+		uint8_t  verMin = 0;
+		uint8_t  size8 = 0;      // Anzahl 8-Byte-Blöcke
+		uint8_t  access = 0;      // 0x00 meist RW, 0x0F RO
+		uint16_t userBytes = 0;    // size8 * 8
+		uint16_t userPages = 0;    // userBytes / 4
+		const char* probableType = "Unknown Type 2";
+	};
 
-    // --- Utility ---
-    bool isSameUid(const uint8_t* lhs, const uint8_t* rhs, uint8_t len) {
-        return lhs && rhs && (memcmp(lhs, rhs, len) == 0);
-    }
+	bool isSameUid(const uint8_t* lhs, const uint8_t* rhs, uint8_t len) {
+		return lhs && rhs && (memcmp(lhs, rhs, len) == 0);
+	}
 
-    void dumpHexAscii(const uint8_t* data, size_t len) {
-        Serial.print(F("Data (")); Serial.print(len); Serial.println(F(" bytes):"));
-        for (size_t i = 0; i < len; i += 16) {
-            Serial.printf("%04u: ", (unsigned)i);
-            for (size_t j = 0; j < 16; ++j) {
-                if (i + j < len) Serial.printf("%02X ", data[i + j]);
-                else             Serial.print("   ");
-            }
-            Serial.print(" | ");
-            for (size_t j = 0; j < 16 && (i + j) < len; ++j) {
-                char c = (char)data[i + j];
-                Serial.print(isprint((unsigned char)c) ? c : '.');
-            }
-            Serial.println();
-        }
-    }
+	void dumpHexAscii(const uint8_t* data, size_t len) {
+		Serial.print(F("Data (")); Serial.print(len); Serial.println(F(" bytes):"));
+		for (size_t i = 0; i < len; i += 16) {
+			Serial.printf("%04u: ", (unsigned)i);
+			for (size_t j = 0; j < 16; ++j) {
+				if (i + j < len) Serial.printf("%02X ", data[i + j]);
+				else             Serial.print("   ");
+			}
+			Serial.print(" | ");
+			for (size_t j = 0; j < 16 && (i + j) < len; ++j) {
+				char c = (char)data[i + j];
+				Serial.print(isprint((unsigned char)c) ? c : '.');
+			}
+			Serial.println();
+		}
+	}
 
-    // --- Lesen des kompletten User-Speichers (Pages 4..39) ---
-    bool readUserMemory(uint8_t* buffer, size_t length) {
-        if (!buffer || length < kUserBytes) return false;
-        for (uint8_t i = 0; i < kUserPageCount; ++i) {
-            if (!nfc.mifareultralight_ReadPage(kFirstUserPage + i,
-                buffer + i * kBytesPerPage)) {
-                return false;
-            }
-        }
-        return true;
-    }
+	/* ---------- CC lesen (Page 3) und TagInfo ableiten ---------- */
+	bool readCapabilityContainer(TagInfo& out) {
+		uint8_t page3[4] = { 0 };
+		if (!nfc.mifareultralight_ReadPage(3, page3)) {
+			return false;
+		}
+		out.ccMagic = page3[0];
+		out.verMaj = (page3[1] >> 4) & 0x0F;
+		out.verMin = page3[1] & 0x0F;
+		out.size8 = page3[2];
+		out.access = page3[3];
 
-    // --- TLV Parsing (0x00 NULL, 0x01 Lock, 0x02 Mem, 0x03 NDEF, 0xFE Term) ---
-    struct Tlv {
-        uint8_t tag;
-        const uint8_t* value; // Zeiger auf Value-Beginn innerhalb des Puffers
-        size_t length;        // Wertlänge in Bytes
-        const uint8_t* next;  // Zeiger auf nächstes TLV (oder nullptr)
-    };
+		out.ccValid = (out.ccMagic == 0xE1); // NDEF-kompatibel
 
-    bool parseNextTlv(const uint8_t* start, const uint8_t* end, Tlv& out) {
-        if (!start || start >= end) return false;
-        const uint8_t* p = start;
+		out.userBytes = (uint16_t)out.size8 * 8u;
+		out.userPages = out.userBytes / kBytesPerPage;
 
-        // Überspringe NULL TLVs (0x00)
-        while (p < end && *p == 0x00) ++p;
-        if (p >= end) return false;
+		// Heuristik zur Typ-Benennung per Data Area Size
+		// (häufige Werte – Hersteller-Varianten möglich)
+		switch (out.size8) {
+		case 0x06: out.probableType = "MIFARE Ultralight (48 B user)"; break;   // 48 B
+		case 0x0C: out.probableType = "MIFARE Ultralight C (96 B user)"; break; // 96 B
+		case 0x12: out.probableType = "NTAG213 (144 B user)"; break;            // 144 B
+		case 0x3F: out.probableType = "NTAG215 (504 B user)"; break;            // 504 B
+		case 0x6F: out.probableType = "NTAG216 (888 B user)"; break;            // 888 B
+		default:   out.probableType = "Type 2 (unknown capacity)"; break;
+		}
+		return true;
+	}
 
-        uint8_t tag = *p++;
-        if (tag == 0xFE) { // Terminator
-            out.tag = 0xFE;
-            out.value = nullptr;
-            out.length = 0;
-            out.next = nullptr;
-            return true;
-        }
+	/* ---------- Gesamten User-Memory lesen (ab Page 4) ---------- */
+	bool readUserMemoryDynamic(uint8_t* buffer, size_t bufferCap, const TagInfo& ti) {
+		if (!buffer || ti.userBytes == 0) return false;
+		if (ti.userBytes > bufferCap)     return false;
 
-        if (p >= end) return false;
+		for (uint16_t i = 0; i < ti.userPages; ++i) {
+			if (!nfc.mifareultralight_ReadPage(kFirstUserPage + i,
+				buffer + i * kBytesPerPage)) {
+				return false;
+			}
+		}
+		return true;
+	}
 
-        size_t len = 0;
-        if (*p == 0xFF) {
-            // Extended length (3 Byte Länge): 0xFF, then two following bytes = length
-            ++p;
-            if (p + 1 >= end) return false;
-            len = (size_t)p[0] << 8 | (size_t)p[1];
-            p += 2;
-        }
-        else {
-            len = *p++;
-        }
+	/* ---------- TLV Parsing ---------- */
+	struct Tlv {
+		uint8_t tag;
+		const uint8_t* value;
+		size_t length;
+		const uint8_t* next;
+	};
 
-        if ((size_t)(end - p) < len) {
-            // Länge überschreitet Puffer – unvollständig
-            return false;
-        }
+	bool parseNextTlv(const uint8_t* start, const uint8_t* end, Tlv& out) {
+		if (!start || start >= end) return false;
+		const uint8_t* p = start;
 
-        out.tag = tag;
-        out.value = p;
-        out.length = len;
-        const uint8_t* next = p + len;
-        out.next = (next < end) ? next : nullptr;
-        return true;
-    }
+		while (p < end && *p == 0x00) ++p; // NULL TLVs
+		if (p >= end) return false;
 
-    // --- NDEF Record Parsing (einfach: SR/!SR, IL optional) ---
-    struct NdefRecord {
-        uint8_t tnf;               // 0..7
-        bool mb;
-        bool me;
-        bool sr;
-        bool il;
-        uint8_t typeLen;           // 1 Byte
-        uint32_t payloadLen;       // 1 oder 4 Bytes je nach SR
-        uint8_t idLen;             // falls IL gesetzt
-        const uint8_t* type;       // zeigt in Message
-        const uint8_t* id;         // optional
-        const uint8_t* payload;    // zeigt in Message
-    };
+		uint8_t tag = *p++;
+		if (tag == 0xFE) { // Terminator
+			out.tag = 0xFE; out.value = nullptr; out.length = 0; out.next = nullptr;
+			return true;
+		}
 
-    bool parseFirstNdefRecord(const uint8_t* msg, size_t msgLen, NdefRecord& rec) {
-        if (!msg || msgLen < 3) return false;
+		if (p >= end) return false;
 
-        const uint8_t* p = msg;
-        uint8_t hdr = *p++;
+		size_t len = 0;
+		if (*p == 0xFF) { // extended length
+			++p; if (p + 1 >= end) return false;
+			len = ((size_t)p[0] << 8) | (size_t)p[1]; p += 2;
+		}
+		else {
+			len = *p++;
+		}
 
-        rec.mb = (hdr & 0x80) != 0;
-        rec.me = (hdr & 0x40) != 0;
-        bool cf = (hdr & 0x20) != 0; // Chunk Flag (ignorieren, nicht unterstützt)
-        rec.sr = (hdr & 0x10) != 0;
-        rec.il = (hdr & 0x08) != 0;
-        rec.tnf = (hdr & 0x07);
+		if ((size_t)(end - p) < len) return false;
 
-        if (cf) return false; // Einfachheit: keine Chunked Records unterstützen
+		out.tag = tag; out.value = p; out.length = len;
+		const uint8_t* next = p + len;
+		out.next = (next < end) ? next : nullptr;
+		return true;
+	}
 
-        if ((size_t)(msg + msgLen - p) < 1) return false;
-        rec.typeLen = *p++;
+	/* ---------- NDEF Parsing (erster Record) ---------- */
+	struct NdefRecord {
+		uint8_t tnf; bool mb; bool me; bool sr; bool il;
+		uint8_t  typeLen; uint32_t payloadLen; uint8_t idLen;
+		const uint8_t* type; const uint8_t* id; const uint8_t* payload;
+	};
 
-        if (rec.sr) {
-            if ((size_t)(msg + msgLen - p) < 1) return false;
-            rec.payloadLen = *p++;
-        }
-        else {
-            if ((size_t)(msg + msgLen - p) < 4) return false;
-            rec.payloadLen = ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) |
-                ((uint32_t)p[2] << 8) | ((uint32_t)p[3]);
-            p += 4;
-        }
+	bool parseFirstNdefRecord(const uint8_t* msg, size_t msgLen, NdefRecord& rec) {
+		if (!msg || msgLen < 3) return false;
+		const uint8_t* p = msg;
 
-        if (rec.il) {
-            if ((size_t)(msg + msgLen - p) < 1) return false;
-            rec.idLen = *p++;
-        }
-        else {
-            rec.idLen = 0;
-        }
+		uint8_t hdr = *p++;
+		rec.mb = hdr & 0x80; rec.me = hdr & 0x40;
+		bool cf = hdr & 0x20; rec.sr = hdr & 0x10; rec.il = hdr & 0x08;
+		rec.tnf = hdr & 0x07;
+		if (cf) return false; // keine Chunk-Unterstützung
 
-        // Type
-        if ((size_t)(msg + msgLen - p) < rec.typeLen) return false;
-        rec.type = p; p += rec.typeLen;
+		if ((size_t)(msg + msgLen - p) < 1) return false;
+		rec.typeLen = *p++;
 
-        // ID (optional)
-        if (rec.idLen) {
-            if ((size_t)(msg + msgLen - p) < rec.idLen) return false;
-            rec.id = p; p += rec.idLen;
-        }
-        else {
-            rec.id = nullptr;
-        }
+		if (rec.sr) {
+			if ((size_t)(msg + msgLen - p) < 1) return false;
+			rec.payloadLen = *p++;
+		}
+		else {
+			if ((size_t)(msg + msgLen - p) < 4) return false;
+			rec.payloadLen = ((uint32_t)p[0] << 24) | ((uint32_t)p[1] << 16) |
+				((uint32_t)p[2] << 8) | ((uint32_t)p[3]); p += 4;
+		}
 
-        // Payload
-        if ((size_t)(msg + msgLen - p) < rec.payloadLen) return false;
-        rec.payload = p; // p + payloadLen wäre Ende des Records
-        return true;
-    }
+		if (rec.il) { if ((size_t)(msg + msgLen - p) < 1) return false; rec.idLen = *p++; }
+		else rec.idLen = 0;
 
-    // --- Dekodierung gängiger Record-Typen ---
-    void decodeAndPrintRecord(const NdefRecord& r) {
-        // Well-known Text (RTD/T)
-        if (r.tnf == 0x01 && r.typeLen == 1 && r.type && r.type[0] == 'T') {
-            if (r.payloadLen < 1) { Serial.println(F("Empty RTD/T payload")); return; }
-            uint8_t status = r.payload[0];
-            bool utf16 = (status & 0x80) != 0;
-            uint8_t langLen = (status & 0x3F);
+		if ((size_t)(msg + msgLen - p) < rec.typeLen) return false;
+		rec.type = p; p += rec.typeLen;
 
-            if (r.payloadLen < (size_t)(1 + langLen)) {
-                Serial.println(F("RTD/T payload too short"));
-                return;
-            }
+		if (rec.idLen) { if ((size_t)(msg + msgLen - p) < rec.idLen) return false; rec.id = p; p += rec.idLen; }
+		else rec.id = nullptr;
 
-            const char* enc = utf16 ? "UTF-16" : "UTF-8";
-            String lang;
-            for (uint8_t i = 0; i < langLen; ++i) lang += (char)r.payload[1 + i];
+		if ((size_t)(msg + msgLen - p) < rec.payloadLen) return false;
+		rec.payload = p;
+		return true;
+	}
 
-            size_t textLen = r.payloadLen - 1 - langLen;
-            const uint8_t* textPtr = r.payload + 1 + langLen;
+	void decodeAndPrintTextRecord(const NdefRecord& r) {
+		if (!(r.tnf == 0x01 && r.typeLen == 1 && r.type && r.type[0] == 'T')) return;
+		if (r.payloadLen < 1) { Serial.println(F("Empty RTD/T payload")); return; }
 
-            Serial.print(F("NDEF Text: ("));
-            Serial.print(enc);
-            Serial.print(F(", "));
-            Serial.print(lang);
-            Serial.println(F(")"));
+		uint8_t status = r.payload[0];
+		bool utf16 = (status & 0x80) != 0;
+		uint8_t langLen = (status & 0x3F);
+		if (r.payloadLen < (size_t)(1 + langLen)) { Serial.println(F("RTD/T payload too short")); return; }
 
-            // Bei UTF-16 ist reine Serial-Ausgabe heikel; hier Hex + ggf. Versuch:
-            if (utf16) {
-                Serial.println(F("UTF-16 payload (hex):"));
-                dumpHexAscii(textPtr, textLen);
-            }
-            else {
-                // Versuche als String auszugeben (nicht null-terminiert)
-                Serial.println(F("Text payload:"));
-                for (size_t i = 0; i < textLen; ++i) {
-                    char c = (char)textPtr[i];
-                    Serial.print(isprint((unsigned char)c) ? c : '.');
-                }
-                Serial.println();
-            }
-            return;
-        }
+		String lang; for (uint8_t i = 0; i < langLen; ++i) lang += (char)r.payload[1 + i];
+		const uint8_t* textPtr = r.payload + 1 + langLen;
+		size_t textLen = r.payloadLen - 1 - langLen;
 
-        // MIME Media (TNF=0x02), z. B. "text/plain"
-        if (r.tnf == 0x02 && r.type && r.typeLen > 0) {
-            Serial.print(F("NDEF MIME type: "));
-            for (uint8_t i = 0; i < r.typeLen; ++i) Serial.print((char)r.type[i]);
-            Serial.println();
-
-            Serial.println(F("Payload:"));
-            dumpHexAscii(r.payload, r.payloadLen);
-            return;
-        }
-
-        // Well-known URI (RTD/URI = 'U')
-        if (r.tnf == 0x01 && r.typeLen == 1 && r.type[0] == 'U' && r.payloadLen >= 1) {
-            // URI Identifier Code Tabelle wäre hier nötig; wir dumpen payload roh:
-            Serial.println(F("NDEF URI record payload (raw):"));
-            dumpHexAscii(r.payload, r.payloadLen);
-            return;
-        }
-
-        // Fallback
-        Serial.print(F("Unhandled NDEF record: TNF="));
-        Serial.print(r.tnf);
-        Serial.print(F(", Type=\""));
-        for (uint8_t i = 0; i < r.typeLen; ++i) Serial.print((char)r.type[i]);
-        Serial.println(F("\""));
-        Serial.println(F("Payload (hex):"));
-        dumpHexAscii(r.payload, r.payloadLen);
-    }
+		Serial.print(F("NDEF Text: ("));
+		Serial.print(utf16 ? F("UTF-16") : F("UTF-8"));
+		Serial.print(F(", ")); Serial.print(lang); Serial.println(F(")"));
+		Serial.println(F("Text payload:"));
+		if (utf16) dumpHexAscii(textPtr, textLen);
+		else {
+			for (size_t i = 0; i < textLen; ++i) {
+				char c = (char)textPtr[i];
+				Serial.print(isprint((unsigned char)c) ? c : '.');
+			}
+			Serial.println();
+		}
+	}
 
 } // namespace
 
 
 void setup() {
-    Serial.begin(115200);
-    while (!Serial) { delay(10); }
+	Serial.begin(115200);
+	while (!Serial) { delay(10); }
 
-    PN532_HSU_PORT.begin(PN532_HSU_BAUDRATE, SERIAL_8N1,
-        PN532_HSU_RX_PIN, PN532_HSU_TX_PIN);
+	PN532_HSU_PORT.begin(PN532_HSU_BAUDRATE, SERIAL_8N1,
+		PN532_HSU_RX_PIN, PN532_HSU_TX_PIN);
 
-    nfc.begin();
+	nfc.begin();
 
-    uint32_t versiondata = nfc.getFirmwareVersion();
-    if (!versiondata) {
-        Serial.println(F("PN532 not found (check wiring & HSU mode)"));
-        while (true) { delay(1000); }
-    }
+	uint32_t versiondata = nfc.getFirmwareVersion();
+	if (!versiondata) {
+		Serial.println(F("PN532 not found (check wiring & HSU mode)"));
+		while (true) { delay(1000); }
+	}
 
-    Serial.print(F("Found chip PN5"));
-    Serial.println((versiondata >> 24) & 0xFF, HEX);
-    Serial.print(F("Firmware ver. "));
-    Serial.print((versiondata >> 16) & 0xFF, DEC);
-    Serial.print('.');
-    Serial.println((versiondata >> 8) & 0xFF, DEC);
+	Serial.print(F("Found chip PN5"));
+	Serial.println((versiondata >> 24) & 0xFF, HEX);
+	Serial.print(F("Firmware ver. "));
+	Serial.print((versiondata >> 16) & 0xFF, DEC);
+	Serial.print('.');
+	Serial.println((versiondata >> 8) & 0xFF, DEC);
 
-    nfc.SAMConfig();
-    nfc.setPassiveActivationRetries(0xFF);
+	nfc.SAMConfig();
+	nfc.setPassiveActivationRetries(0xFF);
 
-    Serial.println(F("Waiting for an ISO14443A Card ..."));
+	Serial.println(F("Waiting for an ISO14443A Card ..."));
 }
 
 void loop() {
-    static uint8_t lastUid[kUidBufferMax] = { 0 };
-    static uint8_t lastUidLength = 0;
-    static bool    tagPresent = false;
+	static uint8_t lastUid[kUidBufferMax] = { 0 };
+	static uint8_t lastUidLength = 0;
+	static bool    tagPresent = false;
 
-    uint8_t uid[kUidBufferMax] = { 0 };
-    uint8_t uidLength = 0;
+	uint8_t uid[kUidBufferMax] = { 0 };
+	uint8_t uidLength = 0;
 
-    if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
-        bool newTagDetected = (!tagPresent) ||
-            (uidLength != lastUidLength) ||
-            (!isSameUid(uid, lastUid, uidLength));
+	if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength)) {
+		bool newTagDetected = (!tagPresent) ||
+			(uidLength != lastUidLength) ||
+			(!isSameUid(uid, lastUid, uidLength));
 
-        if (newTagDetected) 
-        {
-            tagPresent = true;
-            lastUidLength = uidLength;
-            memcpy(lastUid, uid, uidLength);
+		if (newTagDetected) {
+			tagPresent = true;
+			lastUidLength = uidLength;
+			memcpy(lastUid, uid, uidLength);
 
-            Serial.print(F("Tag detected. UID length: "));
-            Serial.println(uidLength);
-            Serial.print(F("UID: "));
-            nfc.PrintHex(uid, uidLength);
+			Serial.print(F("Tag detected. UID length: "));
+			Serial.println(uidLength);
+			Serial.print(F("UID: ")); nfc.PrintHex(uid, uidLength);
 
-            // 1) User-Memory lesen
-            uint8_t user[kUserBytes] = { 0 };
-            if (!readUserMemory(user, sizeof(user))) {
-                Serial.println(F("Failed to read user memory (pages 4..39)"));
-                return;
-            }
+			// --- 1) CC lesen & interpretieren ---
+			TagInfo ti{};
+			if (!readCapabilityContainer(ti)) {
+				Serial.println(F("Failed to read Capability Container (page 3)"));
+				return;
+			}
 
-            // Optional: Rohdump
-            // dumpHexAscii(user, sizeof(user));
+			Serial.print(F("CC: Magic=0x")); Serial.print(ti.ccMagic, HEX);
+			Serial.print(F(", Ver=")); Serial.print(ti.verMaj); Serial.print('.'); Serial.print(ti.verMin);
+			Serial.print(F(", Size8=0x")); Serial.print(ti.size8, HEX);
+			Serial.print(F(" (")); Serial.print(ti.userBytes); Serial.print(F(" bytes user)"));
+			Serial.print(F(", Access=0x")); Serial.print(ti.access, HEX);
+			Serial.println();
 
-            // 2) TLV finden: NDEF (0x03)
-            const uint8_t* p = user;
-            const uint8_t* end = user + sizeof(user);
+			if (!ti.ccValid) {
+				Serial.println(F("Warning: CC Magic != 0xE1 (evtl. kein NDEF-Tag oder CC korrupt)"));
+			}
 
-            Tlv tlv{};
-            bool foundNdef = false;
-            while (parseNextTlv(p, end, tlv)) {
-                if (tlv.tag == 0x03) { // NDEF Message TLV
-                    foundNdef = true;
-                    break;
-                }
-                if (tlv.tag == 0xFE) break; // Terminator
-                if (!tlv.next) break;
-                p = tlv.next;
-            }
+			Serial.print(F("Probable type: "));
+			Serial.println(ti.probableType);
 
-            if (!foundNdef) {
-                Serial.println(F("No NDEF TLV found"));
-                return;
-            }
+			// --- 2) User Memory vollständig lesen (dynamisch) ---
+			static uint8_t user[kUserMaxBytes];
+			if (!readUserMemoryDynamic(user, sizeof(user), ti)) {
+				Serial.println(F("Failed to read user memory"));
+				return;
+			}
 
-            Serial.print(F("NDEF length (TLV): "));
-            Serial.println((unsigned)tlv.length);
+			// Optional: Rohdump
+			// dumpHexAscii(user, ti.userBytes);
 
-            // 3) Ersten NDEF-Record parsen
-            NdefRecord rec{};
-            if (!parseFirstNdefRecord(tlv.value, tlv.length, rec)) {
-                Serial.println(F("Failed to parse first NDEF record"));
-                return;
-            }
+			// --- 3) TLV scannen: NDEF (0x03) finden ---
+			const uint8_t* p = user;
+			const uint8_t* end = user + ti.userBytes;
 
-            // 4) Inhalt interpretieren/ausgeben
-            decodeAndPrintRecord(rec);
-        }
-    }
-    else if (tagPresent) {
-        tagPresent = false;
-        lastUidLength = 0;
-        memset(lastUid, 0, sizeof(lastUid));
-        Serial.println(F("Tag removed"));
-    }
+			Tlv tlv{};
+			bool foundNdef = false;
+			while (parseNextTlv(p, end, tlv)) {
+				if (tlv.tag == 0x03) { foundNdef = true; break; }
+				if (tlv.tag == 0xFE) break;
+				if (!tlv.next) break;
+				p = tlv.next;
+			}
 
-    delay(250);
+			if (foundNdef) {
+				Serial.print(F("NDEF length (TLV): "));
+				Serial.println((unsigned)tlv.length);
+
+				// --- 4) Ersten NDEF-Record parsen & bei Text ausgeben ---
+				NdefRecord rec{};
+				if (parseFirstNdefRecord(tlv.value, tlv.length, rec)) {
+					// Wenn es ein Text-Record ist, gib den Text direkt aus (wie bei dir genutzt)
+					if (rec.tnf == 0x01 && rec.typeLen == 1 && rec.type && rec.type[0] == 'T') {
+						decodeAndPrintTextRecord(rec);
+					}
+					else {
+						Serial.println(F("First NDEF record is not a Text (RTD/T) record."));
+						Serial.println(F("Record header / payload (hex):"));
+						dumpHexAscii(tlv.value, tlv.length);
+					}
+				}
+				else {
+					Serial.println(F("Failed to parse first NDEF record"));
+				}
+			}
+			else {
+				Serial.println(F("No NDEF TLV found (0x03)"));
+			}
+		}
+	}
+	else if (tagPresent) {
+		tagPresent = false;
+		lastUidLength = 0;
+		memset(lastUid, 0, sizeof(lastUid));
+		Serial.println(F("Tag removed"));
+	}
+
+	delay(250);
 }
