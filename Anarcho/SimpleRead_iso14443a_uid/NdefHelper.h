@@ -31,7 +31,7 @@ public:
 	bool parseFirstRecord(const uint8_t* msg, size_t msgLen, NdefRecord& rec) const;
 	bool isTextRecord(const NdefRecord& rec) const;
 	void decodeAndPrintTextRecord(const NdefRecord& rec) const;
-	void dumpHexAscii(const uint8_t* data, size_t len) const;
+        String getString(const uint8_t* data, size_t len) const;
 
 private:
 	bool parseNextTlv(const uint8_t* start, const uint8_t* end, Tlv& out) const;
