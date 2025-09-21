@@ -32,10 +32,10 @@ void DisplayManager::begin(Orientation orientation)
     showMessage("Hello", false);
 }
 
-void DisplayManager::showMessage(const String& message, bool withOverlay) {
-    
+void DisplayManager::showMessage(const String& message, bool withOverlay)
+{
     tft.fillScreen(TFT_BLACK);
-    tft.setTextDatum(MC_DATUM);  // Mitte zentriert
+    tft.setTextDatum(MC_DATUM); // Mitte zentriert
     tft.setTextColor(TFT_GREEN, TFT_BLACK);
 
     // Maximale Displaygröße
@@ -43,12 +43,14 @@ void DisplayManager::showMessage(const String& message, bool withOverlay) {
     int maxHeight = tft.height() - 10;
 
     int bestSize = 1;
-    for (int size = 1; size <= 8; ++size) {  // 1 bis 7 sind vernünftig
+    for (int size = 1; size <= 8; ++size) // 1 bis 7 sind vernünftig
+    {
         tft.setTextSize(size);
         int16_t w = tft.textWidth(message);
         int16_t h = 8 * size;  // Standardhöhe der Schrift bei Größe 1 = 8px
 
-        if (w > maxWidth || h > maxHeight) {
+        if (w > maxWidth || h > maxHeight)
+        {
             break;  // letzte gültige Größe war bestSize
         }
         bestSize = size;
@@ -58,4 +60,64 @@ void DisplayManager::showMessage(const String& message, bool withOverlay) {
     tft.drawString(message, tft.width() / 2, tft.height() / 2);
 
     // drawStatusOverlay();  // Sprite neu zeichnen
+}
+
+void DisplayManager::showMessage(const std::vector<String>& messages)
+{
+    tft.fillScreen(TFT_BLACK);
+    tft.setTextDatum(MC_DATUM);
+    tft.setTextColor(TFT_GREEN, TFT_BLACK);
+
+    if (messages.empty())
+    {
+        showMessage(String("no data in record 1"));
+        return;
+    }
+
+    constexpr uint8_t maxLines = 3;
+    const size_t lineCount = messages.size() < maxLines ? messages.size() : maxLines;
+
+    const int16_t margin = 10;
+    const int16_t availableWidth = tft.width() - (margin * 2);
+    const int16_t availableHeight = tft.height() - (margin * 2);
+
+    int bestSize = 1;
+    for (int size = 1; size <= 8; ++size)
+    {
+        tft.setTextSize(size);
+        const int16_t lineHeight = 8 * size;
+        const int16_t totalHeight = lineHeight * maxLines;
+
+        if (totalHeight > availableHeight)
+        {
+            break;
+        }
+
+        bool fits = true;
+        for (size_t i = 0; i < lineCount; ++i)
+        {
+            if (tft.textWidth(messages[i]) > availableWidth)
+            {
+                fits = false;
+                break;
+            }
+        }
+
+        if (!fits)
+        {
+            break;
+        }
+
+        bestSize = size;
+    }
+
+    tft.setTextSize(bestSize);
+    const int16_t lineHeight = 8 * bestSize;
+    const int16_t totalVisibleHeight = lineHeight * static_cast<int16_t>(lineCount);
+    const int16_t startY = (tft.height() - totalVisibleHeight) / 2 + (lineHeight / 2);
+
+    for (size_t i = 0; i < lineCount; ++i)
+    {
+        tft.drawString(messages[i], tft.width() / 2, startY + (lineHeight * static_cast<int16_t>(i)));
+    }
 }
