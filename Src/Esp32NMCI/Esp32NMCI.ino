@@ -16,6 +16,7 @@
 
 #include <PN532.h>
 #include <PN532_HSU.h>
+#include <vector>
 
 #include "src/config.h"
 #include "src/CardReader/CardReaderManager.h"
@@ -33,11 +34,24 @@ static Type2TagReader tagReader(nfc);
 static NdefHelper ndefHelper;
 static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
 static CardPayloadProcessor cardPayloadProcessor;
-static String lastProcessedPayload;
+static std::vector<String> lastProcessedPayload;
 
 static void OnNewData(const String &payloadText)
 {
     lastProcessedPayload = cardPayloadProcessor.ProcessPayload(payloadText);
+
+    if (lastProcessedPayload.empty())
+    {
+        Logger::LogWarn(F("Received empty card payload."));
+        return;
+    }
+
+    Logger::LogInfo(F("Processed card payload values:"));
+
+    for (size_t index = 0; index < lastProcessedPayload.size(); ++index)
+    {
+        Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), lastProcessedPayload[index].c_str());
+    }
 }
 
 void setup()
