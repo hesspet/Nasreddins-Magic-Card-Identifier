@@ -76,7 +76,10 @@ void CardReaderManager::handleTagDetected(const uint8_t *uid, uint8_t uidLength)
     Logger::LogDebug(F("Tag detected. UID length: "), false);
     Logger::LogDebug(uidLength);
     Logger::LogDebug(F("UID: "), false);
-    nfc_.PrintHex(uid, uidLength);
+    if (Logger::isLogLevelDebug())
+    {
+        nfc_.PrintHex(uid, uidLength);
+    }
 
     Type2TagReader::TagInfo ti{};
     if (!tagReader_.readCapabilityContainer(ti))
@@ -147,8 +150,8 @@ void CardReaderManager::handleTagRemoved()
 
 void CardReaderManager::processRecord(const NdefHelper::NdefRecord &record)
 {
-    Logger::LogInfo(F("OnNewData - payload length: "), false);
-    Logger::LogInfo(static_cast<unsigned long>(record.payloadLen));
+    Logger::LogDebug(F("OnNewData - payload length: "), false);
+    Logger::LogDebug(static_cast<unsigned long>(record.payloadLen));
 
     String resolvedText;
     if (!resolvePayloadText(record, resolvedText))
@@ -195,12 +198,6 @@ bool CardReaderManager::resolvePayloadText(const NdefHelper::NdefRecord &record,
         size_t textLen = record.payloadLen - 1 - langLen;
 
         resolvedText.reserve(lang.length() + textLen + 32);
-        resolvedText = F("NDEF Text: (");
-        resolvedText += utf16 ? F("UTF-16") : F("UTF-8");
-        resolvedText += F(", ");
-        resolvedText += lang;
-        resolvedText += F(")\n");
-        resolvedText += F("Text payload:\n");
 
         if (utf16)
         {

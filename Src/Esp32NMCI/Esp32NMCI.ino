@@ -24,6 +24,7 @@
 #include "src/CardReader/Type2TagReader.h"
 #include "src/Logger/Logger.h"
 
+
 /* Card Reader */
 
 static PN532_HSU pn532hsu(PN532_HSU_PORT);
@@ -38,6 +39,9 @@ static String lastProcessedPayload;
 static void OnNewData(const String &payloadText)
 {
     lastProcessedPayload = cardPayloadProcessor.ProcessPayload(payloadText);
+
+    Logger::LogInfo("Record 1 from card:", false);Logger::LogInfo(payloadText);
+
 }
 
 void setup()
