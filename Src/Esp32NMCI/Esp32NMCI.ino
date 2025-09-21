@@ -34,6 +34,38 @@ static NdefHelper ndefHelper;
 static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
 static CardPayloadProcessor cardPayloadProcessor(ndefHelper);
 
+void CardPayloadProcessor::OnPayloadRead(const NdefHelper::NdefRecord &record)
+{
+    Logger::LogInfo(F("OnPayloadRead - payload length: "), false);
+    Logger::LogInfo(static_cast<unsigned long>(record.payloadLen));
+
+    if (!instance_)
+    {
+        Logger::LogError(F("CardPayloadProcessor instance not initialized."));
+        return;
+    }
+
+    if (!record.payload || record.payloadLen == 0)
+    {
+        Logger::LogWarn(F("Received record with empty payload."));
+        return;
+    }
+
+    if (instance_->ndefHelper_.isTextRecord(record))
+    {
+        instance_->ndefHelper_.decodeAndPrintTextRecord(record);
+    }
+    else
+    {
+        Logger::LogWarn(F("First NDEF record is not a Text (RTD/T) record."));
+        Logger::LogDebug(F("Payload (hex):"));
+
+        const String payload = instance_->ndefHelper_.getString(record.payload, record.payloadLen);
+
+        instance_->ProcessPayload(payload);
+    }
+}
+
 void setup()
 {
     Logger::begin(115200, true, Logger::Level::Info);
