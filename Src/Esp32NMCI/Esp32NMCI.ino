@@ -14,6 +14,8 @@
 */
 /**************************************************************************/
 
+#include <SPI.h>
+#include <TFT_eSPI.h>
 #include <PN532.h>
 #include <PN532_HSU.h>
 #include <vector>
@@ -24,6 +26,7 @@
 #include "src/CardReader/NdefHelper.h"
 #include "src/CardReader/Type2TagReader.h"
 #include "src/Logger/Logger.h"
+#include "src/Presentation/DisplayManager.h"
 
 
 /* Card Reader */
@@ -35,13 +38,14 @@ static Type2TagReader tagReader(nfc);
 static NdefHelper ndefHelper;
 static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
 static CardPayloadProcessor cardPayloadProcessor;
-static std::vector<String> lastProcessedPayload;
+static std::vector<String> ListElementsInPayloadFromCard;
+static DisplayManager displayManager;
 
 static void OnNewData(const String &payloadText)
 {
-    lastProcessedPayload = cardPayloadProcessor.ProcessPayload(payloadText);
+    ListElementsInPayloadFromCard = cardPayloadProcessor.ProcessPayload(payloadText);
 
-    if (lastProcessedPayload.empty())
+    if (ListElementsInPayloadFromCard.empty())
     {
         Logger::LogWarn(F("Received empty card payload."));
         return;
@@ -49,15 +53,19 @@ static void OnNewData(const String &payloadText)
 
     Logger::LogInfo(F("Processed card payload values:"));
 
-    for (size_t index = 0; index < lastProcessedPayload.size(); ++index)
+    for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
     {
-        Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), lastProcessedPayload[index].c_str());
+        Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
     }
+
 }
 
 void setup()
 {
     Logger::begin(115200, true, Logger::Level::Info);
+
+    displayManager.begin();
+
     cardReaderManager.setNewDataCallback(OnNewData);
     cardReaderManager.begin();
 }

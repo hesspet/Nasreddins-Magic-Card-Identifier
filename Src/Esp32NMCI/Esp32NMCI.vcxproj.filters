@@ -39,6 +39,9 @@
     <ClCompile Include="src\CardReader\CardReaderManager.cpp">
       <Filter>Src\CardReader</Filter>
     </ClCompile>
+    <ClCompile Include="src\Presentation\DisplayManager.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Esp32NMCI.vsarduino.h">
@@ -63,5 +66,6 @@
     <ClInclude Include="src\CardReader\CardPayloadProcessor.h">
       <Filter>Src\CardReader</Filter>
     </ClInclude>
+    <ClInclude Include="src\Presentation\DisplayManager.h" />
   </ItemGroup>
 </Project>
