@@ -16,9 +16,21 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Esp32NMCI.ino" />
+    <ClCompile Include="NdefHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Type2TagReader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Esp32NMCI.vsarduino.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="NdefHelper.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Type2TagReader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
