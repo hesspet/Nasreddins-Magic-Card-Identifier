@@ -64,7 +64,7 @@ void setup()
 {
     Logger::begin(115200, true, Logger::Level::Info);
 
-    displayManager.begin();
+    displayManager.begin(DisplayManager::Orientation::UsbRight);
 
     cardReaderManager.setNewDataCallback(OnNewData);
     cardReaderManager.begin();
