@@ -4,10 +4,20 @@
 
 CardPayloadProcessor *CardPayloadProcessor::instCardPayloadProcessor_ = nullptr;
 
-CardPayloadProcessor::CardPayloadProcessor(NdefHelper &ndefHelper)
-    : ndefHelper_(ndefHelper)
+CardPayloadProcessor::CardPayloadProcessor()
 {
     instCardPayloadProcessor_ = this;
+}
+
+void CardPayloadProcessor::OnNewData(const String &payloadText)
+{
+    if (!instCardPayloadProcessor_)
+    {
+        Logger::LogError(F("CardPayloadProcessor instance not initialized."));
+        return;
+    }
+
+    instCardPayloadProcessor_->ProcessPayload(payloadText);
 }
 
 void CardPayloadProcessor::ProcessPayload(const String &payload)

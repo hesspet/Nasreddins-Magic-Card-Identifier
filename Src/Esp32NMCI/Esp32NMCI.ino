@@ -32,44 +32,12 @@ static Type2TagReader tagReader(nfc);
 
 static NdefHelper ndefHelper;
 static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
-static CardPayloadProcessor cardPayloadProcessor(ndefHelper);
-
-void CardPayloadProcessor::OnPayloadRead(const NdefHelper::NdefRecord &record)
-{
-    Logger::LogInfo(F("OnPayloadRead - payload length: "), false);
-    Logger::LogInfo(static_cast<unsigned long>(record.payloadLen));
-
-    if (!instCardPayloadProcessor_)
-    {
-        Logger::LogError(F("CardPayloadProcessor instance not initialized."));
-        return;
-    }
-
-    if (!record.payload || record.payloadLen == 0)
-    {
-        Logger::LogWarn(F("Received record with empty payload."));
-        return;
-    }
-
-    if (instCardPayloadProcessor_->ndefHelper_.isTextRecord(record))
-    {
-        instCardPayloadProcessor_->ndefHelper_.decodeAndPrintTextRecord(record);
-    }
-    else
-    {
-        Logger::LogWarn(F("First NDEF record is not a Text (RTD/T) record."));
-        Logger::LogDebug(F("Payload (hex):"));
-
-        const String payload = instCardPayloadProcessor_->ndefHelper_.getString(record.payload, record.payloadLen);
-
-        instCardPayloadProcessor_->ProcessPayload(payload);
-    }
-}
+static CardPayloadProcessor cardPayloadProcessor;
 
 void setup()
 {
     Logger::begin(115200, true, Logger::Level::Info);
-    cardReaderManager.setPayloadCallback(CardPayloadProcessor::OnPayloadRead);
+    cardReaderManager.setNewDataCallback(CardPayloadProcessor::OnNewData);
     cardReaderManager.begin();
 }
 
