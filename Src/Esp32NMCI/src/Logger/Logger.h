@@ -208,6 +208,26 @@ public:
      */
     static void flush();
 
+    /**
+     * @brief Checks whether logging is enabled for a specific level.
+     */
+    static bool isLogLevel(Level level);
+
+    /**
+     * @brief Checks whether info level logging is enabled.
+     */
+    static bool isLogLevelInfo();
+
+    /**
+     * @brief Checks whether warning level logging is enabled.
+     */
+    static bool isLogLevelWarn();
+
+    /**
+     * @brief Checks whether debug level logging is enabled.
+     */
+    static bool isLogLevelDebug();
+
 private:
     template <typename T>
     static void printValue(const T &value, bool newline, Level level)

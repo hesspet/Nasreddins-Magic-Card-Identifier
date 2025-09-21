@@ -33,7 +33,7 @@ static NdefHelper ndefHelper;
 
 void setup()
 {
-    Logger::begin(115200, true );
+    Logger::begin(115200, true, Logger::Level::Info);
 
     // Setup Card Reader
 
