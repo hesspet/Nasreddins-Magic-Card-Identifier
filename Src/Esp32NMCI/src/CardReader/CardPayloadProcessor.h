@@ -2,19 +2,16 @@
 
 #include <Arduino.h>
 
-#include "NdefHelper.h"
-
 class CardPayloadProcessor
 {
     public:
-    explicit CardPayloadProcessor(NdefHelper &ndefHelper);
+    CardPayloadProcessor();
 
-    static void OnPayloadRead(const NdefHelper::NdefRecord &record);
+    static void OnNewData(const String &payloadText);
 
     private:
     void ProcessPayload(const String &payload);
     void ProcessPayloadLine(const String &payload, int &lineStart, bool &firstLine, int &retFlag);
 
     static CardPayloadProcessor *instCardPayloadProcessor_;
-    NdefHelper &ndefHelper_;
 };

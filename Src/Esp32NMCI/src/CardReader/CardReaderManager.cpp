@@ -10,9 +10,9 @@ CardReaderManager::CardReaderManager(PN532 &nfc, Type2TagReader &tagReader, Ndef
 {
 }
 
-void CardReaderManager::setPayloadCallback(PayloadCallback callback)
+void CardReaderManager::setNewDataCallback(NewDataCallback callback)
 {
-    payloadCallback_ = callback;
+    newDataCallback_ = callback;
 }
 
 void CardReaderManager::begin()
@@ -124,7 +124,7 @@ void CardReaderManager::handleTagDetected(const uint8_t *uid, uint8_t uidLength)
         NdefHelper::NdefRecord rec{};
         if (ndefHelper_.parseFirstRecord(tlv.value, tlv.length, rec))
         {
-            notifyPayload(rec);
+            processRecord(rec);
         }
         else
         {
@@ -145,10 +145,88 @@ void CardReaderManager::handleTagRemoved()
     Logger::LogDebug(F("Tag removed"));
 }
 
-void CardReaderManager::notifyPayload(const NdefHelper::NdefRecord &record) const
+void CardReaderManager::processRecord(const NdefHelper::NdefRecord &record)
 {
-    if (payloadCallback_)
+    Logger::LogInfo(F("OnNewData - payload length: "), false);
+    Logger::LogInfo(static_cast<unsigned long>(record.payloadLen));
+
+    String resolvedText;
+    if (!resolvePayloadText(record, resolvedText))
     {
-        payloadCallback_(record);
+        return;
+    }
+
+    notifyNewData(resolvedText);
+}
+
+bool CardReaderManager::resolvePayloadText(const NdefHelper::NdefRecord &record, String &resolvedText) const
+{
+    if (!record.payload || record.payloadLen == 0)
+    {
+        Logger::LogWarn(F("Received record with empty payload."));
+        return false;
+    }
+
+    if (ndefHelper_.isTextRecord(record))
+    {
+        if (record.payloadLen < 1)
+        {
+            Logger::LogInfo(F("Empty RTD/T payload"));
+            return false;
+        }
+
+        uint8_t status = record.payload[0];
+        bool utf16 = (status & 0x80) != 0;
+        uint8_t langLen = (status & 0x3F);
+
+        if (record.payloadLen < static_cast<size_t>(1 + langLen))
+        {
+            Logger::LogInfo(F("RTD/T payload too short"));
+            return false;
+        }
+
+        String lang;
+        for (uint8_t i = 0; i < langLen; ++i)
+        {
+            lang += static_cast<char>(record.payload[1 + i]);
+        }
+
+        const uint8_t *textPtr = record.payload + 1 + langLen;
+        size_t textLen = record.payloadLen - 1 - langLen;
+
+        resolvedText.reserve(lang.length() + textLen + 32);
+        resolvedText = F("NDEF Text: (");
+        resolvedText += utf16 ? F("UTF-16") : F("UTF-8");
+        resolvedText += F(", ");
+        resolvedText += lang;
+        resolvedText += F(")\n");
+        resolvedText += F("Text payload:\n");
+
+        if (utf16)
+        {
+            resolvedText += ndefHelper_.getString(textPtr, textLen);
+        }
+        else
+        {
+            for (size_t i = 0; i < textLen; ++i)
+            {
+                resolvedText += static_cast<char>(textPtr[i]);
+            }
+        }
+
+        return true;
+    }
+
+    Logger::LogWarn(F("First NDEF record is not a Text (RTD/T) record."));
+    Logger::LogDebug(F("Payload (hex):"));
+    resolvedText = ndefHelper_.getString(record.payload, record.payloadLen);
+    return true;
+}
+
+void CardReaderManager::notifyNewData(const String &payloadText) const
+{
+    if (newDataCallback_)
+    {
+        newDataCallback_(payloadText);
     }
 }

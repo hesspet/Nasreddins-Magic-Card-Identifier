@@ -1,5 +1,6 @@
 #pragma once
 
+#include <Arduino.h>
 #include <PN532.h>
 #include <stdint.h>
 
@@ -10,24 +11,26 @@
 class CardReaderManager
 {
     public:
-    using PayloadCallback = void (*)(const NdefHelper::NdefRecord &record);
+    using NewDataCallback = void (*)(const String &resolvedPayload);
 
     CardReaderManager(PN532 &nfc, Type2TagReader &tagReader, NdefHelper &ndefHelper);
 
     void begin();
     void process();
 
-    void setPayloadCallback(PayloadCallback callback);
+    void setNewDataCallback(NewDataCallback callback);
 
     private:
     void handleTagDetected(const uint8_t *uid, uint8_t uidLength);
     void handleTagRemoved();
-    void notifyPayload(const NdefHelper::NdefRecord &record) const;
+    void processRecord(const NdefHelper::NdefRecord &record);
+    bool resolvePayloadText(const NdefHelper::NdefRecord &record, String &resolvedText) const;
+    void notifyNewData(const String &payloadText) const;
 
     PN532 &nfc_;
     Type2TagReader &tagReader_;
     NdefHelper &ndefHelper_;
-    PayloadCallback payloadCallback_ = nullptr;
+    NewDataCallback newDataCallback_ = nullptr;
 
     bool tagPresent_ = false;
     uint8_t lastUid_[kUidBufferMax] = {0};
