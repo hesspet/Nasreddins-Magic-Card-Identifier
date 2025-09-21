@@ -135,9 +135,26 @@ SPI3_HOST = 2
 #ifdef SMOOTH_FONT
   // Call up the SPIFFS (SPI FLASH Filing System) for the anti-aliased fonts
   #define FS_NO_GLOBALS
-  #include <FS.h>
-  #include "SPIFFS.h" // ESP32 only
-  #define FONT_FS_AVAILABLE
+
+  // Some build environments (e.g. host-based unit tests) do not provide the
+  // ESP32 SPIFFS headers.  Check for them before including so such builds can
+  // fall back to bitmap fonts instead of failing at compile time.
+  #ifdef __has_include
+    #if __has_include(<FS.h>)
+      #include <FS.h>
+    #endif
+    #if __has_include(<SPIFFS.h>)
+      #include <SPIFFS.h>
+      #define FONT_FS_AVAILABLE
+    #elif __has_include(<LittleFS.h>)
+      #include <LittleFS.h>
+      #define FONT_FS_AVAILABLE
+    #endif
+  #else
+    #include <FS.h>
+    #include <SPIFFS.h>
+    #define FONT_FS_AVAILABLE
+  #endif
 #endif
 
 
