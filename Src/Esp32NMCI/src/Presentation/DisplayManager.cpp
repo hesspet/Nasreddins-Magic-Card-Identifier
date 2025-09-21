@@ -5,9 +5,15 @@
 
 void DisplayManager::begin()
 {
+    tft.init();
+    tft.setRotation(1);
+
+#ifdef TFT_BL
+    pinMode(TFT_BL, OUTPUT);
+    digitalWrite(TFT_BL, TFT_BACKLIGHT_ON);
+#endif
 
     showMessage("Hello", false);
-    
 }
 
 void DisplayManager::showMessage(const String& message, bool withOverlay) {
@@ -16,18 +22,18 @@ void DisplayManager::showMessage(const String& message, bool withOverlay) {
     tft.setTextDatum(MC_DATUM);  // Mitte zentriert
     tft.setTextColor(TFT_GREEN, TFT_BLACK);
 
-    // Maximale Displaygröße
+    // Maximale DisplaygrÃ¶ÃŸe
     int maxWidth = tft.width() - 10;   // etwas Rand lassen
     int maxHeight = tft.height() - 10;
 
     int bestSize = 1;
-    for (int size = 1; size <= 8; ++size) {  // 1 bis 7 sind vernünftig
+    for (int size = 1; size <= 8; ++size) {  // 1 bis 7 sind vernÃ¼nftig
         tft.setTextSize(size);
         int16_t w = tft.textWidth(message);
-        int16_t h = 8 * size;  // Standardhöhe der Schrift bei Größe 1 = 8px
+        int16_t h = 8 * size;  // StandardhÃ¶he der Schrift bei GrÃ¶ÃŸe 1 = 8px
 
         if (w > maxWidth || h > maxHeight) {
-            break;  // letzte gültige Größe war bestSize
+            break;  // letzte gÃ¼ltige GrÃ¶ÃŸe war bestSize
         }
         bestSize = size;
     }
