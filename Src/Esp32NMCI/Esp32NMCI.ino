@@ -18,20 +18,13 @@
 #include <PN532_HSU.h>
 #include <string.h>
 
+#include "config.h"
 #include "NdefHelper.h"
 #include "Type2TagReader.h"
-
-#define PN532_HSU_PORT Serial2
-static const uint32_t PN532_HSU_BAUDRATE = 115200;
-static const int PN532_HSU_RX_PIN = 26; // ESP32 RX  (an PN532 TX)
-static const int PN532_HSU_TX_PIN = 25; // ESP32 TX  (an PN532 RX)
 
 static PN532_HSU pn532hsu(PN532_HSU_PORT);
 static PN532 nfc(pn532hsu);
 static Type2TagReader tagReader(nfc);
-
-constexpr uint8_t kUidBufferMax = 10;    // 4/7/10 Byte UIDs
-constexpr uint16_t kUserMaxBytes = 1024; // reicht für NTAG216 (888 B)
 
 static NdefHelper ndefHelper;
 
