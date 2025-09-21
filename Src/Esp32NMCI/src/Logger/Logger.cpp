@@ -71,6 +71,26 @@ bool Logger::formatEndsWithNewline(const char *format)
     return lastNewline != nullptr && lastNewline[1] == '\0';
 }
 
+bool Logger::isLogLevel(Level level)
+{
+    return isLevelEnabled(level);
+}
+
+bool Logger::isLogLevelInfo()
+{
+    return isLogLevel(Level::Info);
+}
+
+bool Logger::isLogLevelWarn()
+{
+    return isLogLevel(Level::Warn);
+}
+
+bool Logger::isLogLevelDebug()
+{
+    return isLogLevel(Level::Debug);
+}
+
 bool Logger::isLevelEnabled(Level level)
 {
     return levelPriority(level) >= levelPriority(s_filterLevel);
