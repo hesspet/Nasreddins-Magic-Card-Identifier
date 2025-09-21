@@ -43,6 +43,11 @@ public:
     static void log();
 
     /**
+     * @brief Convenience wrapper for emitting an empty informational log line.
+     */
+    static void LogInfo();
+
+    /**
      * @brief Logs arithmetic values with optional base, newline handling and severity level.
      *
      * Example:
@@ -80,6 +85,12 @@ public:
     {
         (void)base;
         printValue(value, newline, level);
+    }
+
+    template <typename T>
+    static void LogInfo(const T &value, bool newline = true, int base = kNoBase)
+    {
+        log(value, newline, base, Level::Info);
     }
 
     /**

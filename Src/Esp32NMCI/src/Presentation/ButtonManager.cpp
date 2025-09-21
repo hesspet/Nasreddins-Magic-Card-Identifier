@@ -20,7 +20,7 @@ void ButtonManager::update()
     stateA = digitalRead(pinA) == LOW;
     if (stateA && !lastStateA && onButton0Pressed)
     {
-        Logger::log(F("[ButtonManager] Button 0 pressed"));
+        Logger::LogInfo(F("[ButtonManager] Button 0 pressed"));
         onButton0Pressed();
     }
 
@@ -37,7 +37,7 @@ void ButtonManager::update()
         unsigned long duration = millis() - pressStart35;
         if (duration < longPressThreshold && onButton35Pressed)
         {
-            Logger::log(F("[ButtonManager] Button 35 short press"));
+            Logger::LogInfo(F("[ButtonManager] Button 35 short press"));
             onButton35Pressed();
         }
     }
