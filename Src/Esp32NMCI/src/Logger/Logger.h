@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Arduino.h>
+#include <type_traits>
 
 class Logger
 {
@@ -12,30 +13,25 @@ class Logger
     static void log();
 
     template <typename T>
-    static void log(const T &value, bool newline = true, int base = kNoBase)
+    static typename std::enable_if<std::is_arithmetic<typename std::decay<T>::type>::value>::type log(
+        const T &value, bool newline = true, int base = kNoBase)
     {
         if (base == kNoBase)
         {
-            if (newline)
-            {
-                Serial.println(value);
-            }
-            else
-            {
-                Serial.print(value);
-            }
+            printValue(value, newline);
         }
         else
         {
-            if (newline)
-            {
-                Serial.println(value, base);
-            }
-            else
-            {
-                Serial.print(value, base);
-            }
+            printValue(value, newline, base);
         }
+    }
+
+    template <typename T>
+    static typename std::enable_if<!std::is_arithmetic<typename std::decay<T>::type>::value>::type log(
+        const T &value, bool newline = true, int base = kNoBase)
+    {
+        (void)base;
+        printValue(value, newline);
     }
 
     template <typename... Args>
@@ -45,4 +41,31 @@ class Logger
     }
 
     static void flush();
+
+private:
+    template <typename T>
+    static void printValue(const T &value, bool newline)
+    {
+        if (newline)
+        {
+            Serial.println(value);
+        }
+        else
+        {
+            Serial.print(value);
+        }
+    }
+
+    template <typename T>
+    static void printValue(const T &value, bool newline, int base)
+    {
+        if (newline)
+        {
+            Serial.println(value, base);
+        }
+        else
+        {
+            Serial.print(value, base);
+        }
+    }
 };
