@@ -79,6 +79,7 @@
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
     <ClCompile Include="src\CardReader\CardReaderManager.cpp" />
+    <ClCompile Include="src\CardReader\CardPayloadProcessor.cpp" />
     <ClCompile Include="src\CardReader\NdefHelper.cpp" />
     <ClCompile Include="src\CardReader\Type2TagReader.cpp" />
     <ClCompile Include="src\Logger\Logger.cpp" />
@@ -87,6 +88,7 @@
   <ItemGroup>
     <ClInclude Include="..\..\config.h" />
     <ClInclude Include="src\CardReader\CardReaderManager.h" />
+    <ClInclude Include="src\CardReader\CardPayloadProcessor.h" />
     <ClInclude Include="src\CardReader\NdefHelper.h" />
     <ClInclude Include="src\CardReader\Type2TagReader.h" />
     <ClInclude Include="src\Logger\Logger.h" />
