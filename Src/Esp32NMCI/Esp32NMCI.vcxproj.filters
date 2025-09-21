@@ -53,7 +53,6 @@
     <ClInclude Include="src\CardReader\Type2TagReader.h">
       <Filter>Src\CardReader</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\config.h" />
     <ClInclude Include="src\Presentation\ButtonManager.h">
       <Filter>Src\Presentation</Filter>
     </ClInclude>
@@ -67,5 +66,8 @@
       <Filter>Src\CardReader</Filter>
     </ClInclude>
     <ClInclude Include="src\Presentation\DisplayManager.h" />
+    <ClInclude Include="src\config.h">
+      <Filter>Src</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

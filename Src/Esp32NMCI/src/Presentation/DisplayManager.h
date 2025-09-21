@@ -20,11 +20,10 @@ public:
 
 private:
     TFT_eSPI tft = TFT_eSPI();
+    void clearScreen();
     void renderSingleMessage(const String& message, uint16_t textColor);
     void renderMultipleMessages(const std::vector<String>& messages, uint16_t textColor);
-    void rememberMessage(const std::vector<String>& messages, bool isList);
-
-    static constexpr uint32_t MessageDimDelayMs = 5000U;
+    void cacheMessageToRemember(const std::vector<String>& messages, bool isList);
 
     std::vector<String> lastDisplayedLines;
     bool lastMessageWasList = false;

@@ -19,3 +19,7 @@ constexpr uint8_t kUidBufferMax = 10;
 
 // Maximum number of user memory bytes to read from a tag (covers NTAG216).
 constexpr uint16_t kUserMaxBytes = 1024;
+
+
+// DisplayManagerZeit in Ms bis das Display "ausgraut"
+constexpr uint32_t kDisplayManager_TimeToFadeOutDisplay = 5000U;

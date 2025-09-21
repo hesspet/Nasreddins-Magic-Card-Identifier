@@ -91,11 +91,11 @@
     <ClCompile Include="src\Presentation\DisplayManager.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\config.h" />
     <ClInclude Include="src\CardReader\CardReaderManager.h" />
     <ClInclude Include="src\CardReader\CardPayloadProcessor.h" />
     <ClInclude Include="src\CardReader\NdefHelper.h" />
     <ClInclude Include="src\CardReader\Type2TagReader.h" />
+    <ClInclude Include="src\config.h" />
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\Presentation\ButtonManager.h" />
     <ClInclude Include="src\Presentation\DisplayManager.h" />
