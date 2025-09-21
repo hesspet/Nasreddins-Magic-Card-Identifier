@@ -2,12 +2,12 @@
 
 #include "../Logger/Logger.h"
 
-CardPayloadProcessor *CardPayloadProcessor::instance_ = nullptr;
+CardPayloadProcessor *CardPayloadProcessor::instCardPayloadProcessor_ = nullptr;
 
 CardPayloadProcessor::CardPayloadProcessor(NdefHelper &ndefHelper)
     : ndefHelper_(ndefHelper)
 {
-    instance_ = this;
+    instCardPayloadProcessor_ = this;
 }
 
 void CardPayloadProcessor::ProcessPayload(const String &payload)

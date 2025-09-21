@@ -15,6 +15,6 @@ class CardPayloadProcessor
     void ProcessPayload(const String &payload);
     void ProcessPayloadLine(const String &payload, int &lineStart, bool &firstLine, int &retFlag);
 
-    static CardPayloadProcessor *instance_;
+    static CardPayloadProcessor *instCardPayloadProcessor_;
     NdefHelper &ndefHelper_;
 };

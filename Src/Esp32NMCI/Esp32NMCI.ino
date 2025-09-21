@@ -39,7 +39,7 @@ void CardPayloadProcessor::OnPayloadRead(const NdefHelper::NdefRecord &record)
     Logger::LogInfo(F("OnPayloadRead - payload length: "), false);
     Logger::LogInfo(static_cast<unsigned long>(record.payloadLen));
 
-    if (!instance_)
+    if (!instCardPayloadProcessor_)
     {
         Logger::LogError(F("CardPayloadProcessor instance not initialized."));
         return;
@@ -51,18 +51,18 @@ void CardPayloadProcessor::OnPayloadRead(const NdefHelper::NdefRecord &record)
         return;
     }
 
-    if (instance_->ndefHelper_.isTextRecord(record))
+    if (instCardPayloadProcessor_->ndefHelper_.isTextRecord(record))
     {
-        instance_->ndefHelper_.decodeAndPrintTextRecord(record);
+        instCardPayloadProcessor_->ndefHelper_.decodeAndPrintTextRecord(record);
     }
     else
     {
         Logger::LogWarn(F("First NDEF record is not a Text (RTD/T) record."));
         Logger::LogDebug(F("Payload (hex):"));
 
-        const String payload = instance_->ndefHelper_.getString(record.payload, record.payloadLen);
+        const String payload = instCardPayloadProcessor_->ndefHelper_.getString(record.payload, record.payloadLen);
 
-        instance_->ProcessPayload(payload);
+        instCardPayloadProcessor_->ProcessPayload(payload);
     }
 }
 
