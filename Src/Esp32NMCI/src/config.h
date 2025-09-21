@@ -1,0 +1,21 @@
+#pragma once
+
+#include <stdint.h>
+
+// Serial port used to communicate with the PN532 module over High Speed UART.
+#define PN532_HSU_PORT Serial2
+
+// Baud rate for the PN532 HSU serial connection.
+constexpr uint32_t PN532_HSU_BAUDRATE = 115200;
+
+// ESP32 pin receiving data from the PN532 (connect to PN532 TX).
+constexpr int PN532_HSU_RX_PIN = 26;
+
+// ESP32 pin transmitting data to the PN532 (connect to PN532 RX).
+constexpr int PN532_HSU_TX_PIN = 25;
+
+// Maximum UID length supported (Type 2 tags are 4, 7, or 10 bytes).
+constexpr uint8_t kUidBufferMax = 10;
+
+// Maximum number of user memory bytes to read from a tag (covers NTAG216).
+constexpr uint16_t kUserMaxBytes = 1024;

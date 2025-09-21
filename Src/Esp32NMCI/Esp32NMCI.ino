@@ -17,7 +17,7 @@
 #include <PN532.h>
 #include <PN532_HSU.h>
 
-#include "config.h"
+#include "src/config.h"
 #include "src/CardReader/CardReaderManager.h"
 #include "src/CardReader/NdefHelper.h"
 #include "src/CardReader/Type2TagReader.h"

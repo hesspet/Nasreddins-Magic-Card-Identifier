@@ -3,7 +3,7 @@
 #include <PN532.h>
 #include <stdint.h>
 
-#include "../../../../config.h"
+#include "../config.h"
 #include "NdefHelper.h"
 #include "Type2TagReader.h"
 
