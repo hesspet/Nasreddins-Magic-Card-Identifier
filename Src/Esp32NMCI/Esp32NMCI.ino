@@ -55,6 +55,12 @@ static void OnNewData(const String &payloadText)
 
     for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
     {
+        if (index == 0) 
+        {
+            // Ausgabe des Kürzels
+            displayManager.showMessage(ListElementsInPayloadFromCard[index]);
+
+        }
         Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
     }
 
@@ -64,7 +70,7 @@ void setup()
 {
     Logger::begin(115200, true, Logger::Level::Info);
 
-    displayManager.begin(DisplayManager::Orientation::UsbRight);
+    displayManager.begin(DisplayManager::Orientation::UsbLeft);
 
     cardReaderManager.setNewDataCallback(OnNewData);
     cardReaderManager.begin();
