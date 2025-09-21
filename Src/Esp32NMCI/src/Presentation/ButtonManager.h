@@ -3,34 +3,32 @@
 #include <Arduino.h>
 #include <functional>
 
-class ButtonManager {
+class ButtonManager
+{
+    public:
+    ButtonManager(int pinA, int pinB);
 
-public:
+    void begin();
+    void update();
 
-  ButtonManager(int pinA, int pinB);
+    bool isButtonAPressed() const;
+    bool isButtonBPressed() const;
+    bool areBothButtonsPressed() const;
 
-  void begin();
-  void update();
+    void setOnButton0Pressed(std::function<void()> callback);
+    void setOnButton35Pressed(std::function<void()> callback);
 
-  bool isButtonAPressed() const;
-  bool isButtonBPressed() const;
-  bool areBothButtonsPressed() const;
+    private:
+    int pinA;
+    int pinB;
+    bool stateA = false;
+    bool stateB = false;
+    bool lastStateA = false;
+    bool lastStateB = false;
 
-  void setOnButton0Pressed(std::function<void()> callback);
-  void setOnButton35Pressed(std::function<void()> callback);
+    std::function<void()> onButton0Pressed = nullptr;
+    std::function<void()> onButton35Pressed = nullptr;
 
-private:
-
-  int pinA;
-  int pinB;
-  bool stateA = false;
-  bool stateB = false;
-  bool lastStateA = false;
-  bool lastStateB = false;
-
-  std::function<void()> onButton0Pressed = nullptr;
-  std::function<void()> onButton35Pressed = nullptr;
-
-  unsigned long pressStart35 = 0;
-  const unsigned long longPressThreshold = 7000; // ms
+    unsigned long pressStart35 = 0;
+    const unsigned long longPressThreshold = 7000; // ms
 };

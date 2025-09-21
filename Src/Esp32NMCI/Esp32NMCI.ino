@@ -1,4 +1,4 @@
-﻿/**************************************************************************/
+/**************************************************************************/
 /*!
   ESP32 T-Display + PN532 (HSU/UART)
   Erkennung von Type-2-Tag via Capability Container (Page 3),
@@ -6,9 +6,9 @@
   TLV-Parsing, NDEF-Parsing (erster Record) optional Textausgabe.
 
   Verkabelung (HSU/UART):
-		ESP32 TX (GPIO 25) → PN532 RX
-		ESP32 RX (GPIO 26) → PN532 TX
-		3,3V Pegel, PN532 auf HSU/UART gestellt
+                ESP32 TX (GPIO 25) → PN532 RX
+                ESP32 RX (GPIO 26) → PN532 TX
+                3,3V Pegel, PN532 auf HSU/UART gestellt
 
   Serielle Ausgabe: 115200 Baud
 */
@@ -21,6 +21,7 @@
 #include "config.h"
 #include "src/CardReader/NdefHelper.h"
 #include "src/CardReader/Type2TagReader.h"
+#include "src/Logger/Logger.h"
 
 /* Card Reader */
 
@@ -32,151 +33,147 @@ static NdefHelper ndefHelper;
 
 void setup()
 {
-	Serial.begin(115200);
-	while (!Serial)
-	{
-		delay(100);
-	}
+    Logger::begin(115200);
 
-	// Setup Card Reader
+    // Setup Card Reader
 
-	PN532_HSU_PORT.begin(PN532_HSU_BAUDRATE, SERIAL_8N1, PN532_HSU_RX_PIN, PN532_HSU_TX_PIN);
-	nfc.begin();
+    PN532_HSU_PORT.begin(PN532_HSU_BAUDRATE, SERIAL_8N1, PN532_HSU_RX_PIN, PN532_HSU_TX_PIN);
+    nfc.begin();
 
-	uint32_t versiondata = nfc.getFirmwareVersion();
-	if (!versiondata)
-	{
-		Serial.println(F("PN532 not found (check wiring & HSU mode)"));
-		while (true)
-		{
-			delay(1000); // Endless Loop Stop TODO: Write ERROR TO THE T-DISPLAY
-		}
-	}
+    uint32_t versiondata = nfc.getFirmwareVersion();
+    if (!versiondata)
+    {
+        Logger::log(F("PN532 not found (check wiring & HSU mode)"));
+        while (true)
+        {
+            delay(1000); // Endless Loop Stop TODO: Write ERROR TO THE T-DISPLAY
+        }
+    }
 
-	Serial.print(F("Found chip PN5"));
-	Serial.println((versiondata >> 24) & 0xFF, HEX);
-	Serial.print(F("Firmware ver. "));
-	Serial.print((versiondata >> 16) & 0xFF, DEC);
-	Serial.print('.');
-	Serial.println((versiondata >> 8) & 0xFF, DEC);
+    Logger::log(F("Found chip PN5"), false);
+    Logger::log((versiondata >> 24) & 0xFF, true, HEX);
+    Logger::log(F("Firmware ver. "), false);
+    Logger::log((versiondata >> 16) & 0xFF, false, DEC);
+    Logger::log('.', false);
+    Logger::log((versiondata >> 8) & 0xFF, true, DEC);
 
-	nfc.SAMConfig();
-	nfc.setPassiveActivationRetries(0xFF);
+    nfc.SAMConfig();
+    nfc.setPassiveActivationRetries(0xFF);
 
-	Serial.println(F("Waiting for an ISO14443A Card ..."));
+    Logger::log(F("Waiting for an ISO14443A Card ..."));
 }
 
 void loop()
 {
-	static uint8_t lastUid[kUidBufferMax] = { 0 };
-	static uint8_t lastUidLength = 0;
-	static bool tagPresent = false;
+    static uint8_t lastUid[kUidBufferMax] = {0};
+    static uint8_t lastUidLength = 0;
+    static bool tagPresent = false;
 
-	uint8_t uid[kUidBufferMax] = { 0 };
-	uint8_t uidLength = 0;
+    uint8_t uid[kUidBufferMax] = {0};
+    uint8_t uidLength = 0;
 
-	if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength))
-	{
-		bool newTagDetected = (!tagPresent) ||
-			(uidLength != lastUidLength) ||
-			(!Type2TagReader::isSameUid(uid, lastUid, uidLength));
+    if (nfc.readPassiveTargetID(PN532_MIFARE_ISO14443A, uid, &uidLength))
+    {
+        bool newTagDetected = (!tagPresent) ||
+                              (uidLength != lastUidLength) ||
+                              (!Type2TagReader::isSameUid(uid, lastUid, uidLength));
 
-		if (newTagDetected)
-		{
-			tagPresent = true;
-			lastUidLength = uidLength;
-			memcpy(lastUid, uid, uidLength);
+        if (newTagDetected)
+        {
+            tagPresent = true;
+            lastUidLength = uidLength;
+            memcpy(lastUid, uid, uidLength);
 
-			Serial.print(F("Tag detected. UID length: "));
-			Serial.println(uidLength);
-			Serial.print(F("UID: "));
-			nfc.PrintHex(uid, uidLength);
+            Logger::log(F("Tag detected. UID length: "), false);
+            Logger::log(uidLength);
+            Logger::log(F("UID: "), false);
+            nfc.PrintHex(uid, uidLength);
 
-			// --- 1) CC lesen & interpretieren ---
-			Type2TagReader::TagInfo ti{};
-			if (!tagReader.readCapabilityContainer(ti))
-			{
-				Serial.println(F("Failed to read Capability Container (page 3)"));
-				return;
-			}
+            // --- 1) CC lesen & interpretieren ---
+            Type2TagReader::TagInfo ti{};
+            if (!tagReader.readCapabilityContainer(ti))
+            {
+                Logger::log(F("Failed to read Capability Container (page 3)"));
+                return;
+            }
 
-			Serial.print(F("CC: Magic=0x"));
-			Serial.print(ti.ccMagic, HEX);
-			Serial.print(F(", Ver="));
-			Serial.print(ti.verMaj);
-			Serial.print('.');
-			Serial.print(ti.verMin);
-			Serial.print(F(", Size8=0x"));
-			Serial.print(ti.size8, HEX);
-			Serial.print(F(" ("));
-			Serial.print(ti.userBytes);
-			Serial.print(F(" bytes user)"));
-			Serial.print(F(", Access=0x"));
-			Serial.print(ti.access, HEX);
-			Serial.println();
+            Logger::log(F("CC: Magic=0x"), false);
+            Logger::log(ti.ccMagic, false, HEX);
+            Logger::log(F(", Ver="), false);
+            Logger::log(ti.verMaj, false);
+            Logger::log('.', false);
+            Logger::log(ti.verMin, false);
+            Logger::log(F(", Size8=0x"), false);
+            Logger::log(ti.size8, false, HEX);
+            Logger::log(F(" ("), false);
+            Logger::log(ti.userBytes, false);
+            Logger::log(F(" bytes user)"), false);
+            Logger::log(F(", Access=0x"), false);
+            Logger::log(ti.access, false, HEX);
+            Logger::log();
 
-			if (!ti.ccValid)
-			{
-				Serial.println(F("Warning: CC Magic != 0xE1 (evtl. kein NDEF-Tag oder CC korrupt)"));
-			}
+            if (!ti.ccValid)
+            {
+                Logger::log(F("Warning: CC Magic != 0xE1 (evtl. kein NDEF-Tag oder CC korrupt)"));
+            }
 
-			Serial.print(F("Probable type: "));
-			Serial.println(ti.probableType);
+            Logger::log(F("Probable type: "));
+            Logger::log(ti.probableType);
 
-			// --- 2) User Memory vollständig lesen (dynamisch) ---
-			static uint8_t user[kUserMaxBytes];
-			if (!tagReader.readUserMemory(user, sizeof(user), ti))
-			{
-				Serial.println(F("Failed to read user memory"));
-				return;
-			}
+            // --- 2) User Memory vollständig lesen (dynamisch) ---
+            static uint8_t user[kUserMaxBytes];
+            if (!tagReader.readUserMemory(user, sizeof(user), ti))
+            {
+                Logger::log(F("Failed to read user memory"));
+                return;
+            }
 
-			// Optional: Rohdump
-			// ndefHelper.dumpHexAscii(user, ti.userBytes);
+            // Optional: Rohdump
+            // ndefHelper.dumpHexAscii(user, ti.userBytes);
 
-			// --- 3) TLV scannen: NDEF (0x03) finden ---
-			NdefHelper::Tlv tlv{};
-			bool foundNdef = ndefHelper.findFirstNdefTlv(user, ti.userBytes, tlv);
+            // --- 3) TLV scannen: NDEF (0x03) finden ---
+            NdefHelper::Tlv tlv{};
+            bool foundNdef = ndefHelper.findFirstNdefTlv(user, ti.userBytes, tlv);
 
-			if (foundNdef)
-			{
-				Serial.print(F("NDEF length (TLV): "));
-				Serial.println((unsigned)tlv.length);
+            if (foundNdef)
+            {
+                Logger::log(F("NDEF length (TLV): "), false);
+                Logger::log(static_cast<unsigned>(tlv.length));
 
-				// --- 4) Ersten NDEF-Record parsen & bei Text ausgeben ---
-				NdefHelper::NdefRecord rec{};
-				if (ndefHelper.parseFirstRecord(tlv.value, tlv.length, rec))
-				{
-					// Wenn es ein Text-Record ist, gib den Text direkt aus (wie bei dir genutzt)
-					if (ndefHelper.isTextRecord(rec))
-					{
-						ndefHelper.decodeAndPrintTextRecord(rec);
-					}
-					else
-					{
-						Serial.println(F("First NDEF record is not a Text (RTD/T) record."));
-						Serial.println(F("Record header / payload (hex):"));
-						ndefHelper.dumpHexAscii(tlv.value, tlv.length);
-					}
-				}
-				else
-				{
-					Serial.println(F("Failed to parse first NDEF record"));
-				}
-			}
-			else
-			{
-				Serial.println(F("No NDEF TLV found (0x03)"));
-			}
-		}
-	}
-	else if (tagPresent)
-	{
-		tagPresent = false;
-		lastUidLength = 0;
-		memset(lastUid, 0, sizeof(lastUid));
-		Serial.println(F("Tag removed"));
-	}
+                // --- 4) Ersten NDEF-Record parsen & bei Text ausgeben ---
+                NdefHelper::NdefRecord rec{};
+                if (ndefHelper.parseFirstRecord(tlv.value, tlv.length, rec))
+                {
+                    // Wenn es ein Text-Record ist, gib den Text direkt aus (wie bei dir genutzt)
+                    if (ndefHelper.isTextRecord(rec))
+                    {
+                        ndefHelper.decodeAndPrintTextRecord(rec);
+                    }
+                    else
+                    {
+                        Logger::log(F("First NDEF record is not a Text (RTD/T) record."));
+                        Logger::log(F("Record header / payload (hex):"));
+                        ndefHelper.dumpHexAscii(tlv.value, tlv.length);
+                    }
+                }
+                else
+                {
+                    Logger::log(F("Failed to parse first NDEF record"));
+                }
+            }
+            else
+            {
+                Logger::log(F("No NDEF TLV found (0x03)"));
+            }
+        }
+    }
+    else if (tagPresent)
+    {
+        tagPresent = false;
+        lastUidLength = 0;
+        memset(lastUid, 0, sizeof(lastUid));
+        Logger::log(F("Tag removed"));
+    }
 
-	delay(250);
+    delay(250);
 }
