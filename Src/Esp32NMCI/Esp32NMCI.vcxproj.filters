@@ -24,6 +24,9 @@
     <ClCompile Include="src\CardReader\NdefHelper.cpp">
       <Filter>Src\CardReader</Filter>
     </ClCompile>
+    <ClCompile Include="src\CardReader\CardPayloadProcessor.cpp">
+      <Filter>Src\CardReader</Filter>
+    </ClCompile>
     <ClCompile Include="src\CardReader\Type2TagReader.cpp">
       <Filter>Src\CardReader</Filter>
     </ClCompile>
@@ -55,6 +58,9 @@
       <Filter>Src\Logger</Filter>
     </ClInclude>
     <ClInclude Include="src\CardReader\CardReaderManager.h">
+      <Filter>Src\CardReader</Filter>
+    </ClInclude>
+    <ClInclude Include="src\CardReader\CardPayloadProcessor.h">
       <Filter>Src\CardReader</Filter>
     </ClInclude>
   </ItemGroup>
