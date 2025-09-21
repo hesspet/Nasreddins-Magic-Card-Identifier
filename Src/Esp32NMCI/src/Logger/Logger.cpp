@@ -23,6 +23,11 @@ void Logger::log()
     s_atLineStart = true;
 }
 
+void Logger::LogInfo()
+{
+    log();
+}
+
 void Logger::flush()
 {
     Serial.flush();

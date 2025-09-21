@@ -163,7 +163,7 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord &r) const
     }
     if (r.payloadLen < 1)
     {
-        Logger::log(F("Empty RTD/T payload"));
+        Logger::LogInfo(F("Empty RTD/T payload"));
         return;
     }
 
@@ -172,7 +172,7 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord &r) const
     uint8_t langLen = (status & 0x3F);
     if (r.payloadLen < (size_t)(1 + langLen))
     {
-        Logger::log(F("RTD/T payload too short"));
+        Logger::LogInfo(F("RTD/T payload too short"));
         return;
     }
 
@@ -184,12 +184,12 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord &r) const
     const uint8_t *textPtr = r.payload + 1 + langLen;
     size_t textLen = r.payloadLen - 1 - langLen;
 
-    Logger::log(F("NDEF Text: ("), false);
-    Logger::log(utf16 ? F("UTF-16") : F("UTF-8"), false);
-    Logger::log(F(", "), false);
-    Logger::log(lang, false);
-    Logger::log(F(")"));
-    Logger::log(F("Text payload:"));
+    Logger::LogInfo(F("NDEF Text: ("), false);
+    Logger::LogInfo(utf16 ? F("UTF-16") : F("UTF-8"), false);
+    Logger::LogInfo(F(", "), false);
+    Logger::LogInfo(lang, false);
+    Logger::LogInfo(F(")"));
+    Logger::LogInfo(F("Text payload:"));
     if (utf16)
     {
         dumpHexAscii(textPtr, textLen);
@@ -199,17 +199,17 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord &r) const
         for (size_t i = 0; i < textLen; ++i)
         {
             char c = (char)textPtr[i];
-            Logger::log(isprint((unsigned char)c) ? c : '.', false);
+            Logger::LogInfo(isprint((unsigned char)c) ? c : '.', false);
         }
-        Logger::log();
+        Logger::LogInfo();
     }
 }
 
 void NdefHelper::dumpHexAscii(const uint8_t *data, size_t len) const
 {
-    Logger::log(F("Data ("), false);
-    Logger::log(len, false);
-    Logger::log(F(" bytes):"));
+    Logger::LogInfo(F("Data ("), false);
+    Logger::LogInfo(len, false);
+    Logger::LogInfo(F(" bytes):"));
     for (size_t i = 0; i < len; i += 16)
     {
         Logger::logf("%04u: ", (unsigned)i);
@@ -221,15 +221,15 @@ void NdefHelper::dumpHexAscii(const uint8_t *data, size_t len) const
             }
             else
             {
-                Logger::log("   ", false);
+                Logger::LogInfo("   ", false);
             }
         }
-        Logger::log(" | ", false);
+        Logger::LogInfo(" | ", false);
         for (size_t j = 0; j < 16 && (i + j) < len; ++j)
         {
             char c = (char)data[i + j];
-            Logger::log(isprint((unsigned char)c) ? c : '.', false);
+            Logger::LogInfo(isprint((unsigned char)c) ? c : '.', false);
         }
-        Logger::log();
+        Logger::LogInfo();
     }
 }
