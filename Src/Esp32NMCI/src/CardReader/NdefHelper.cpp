@@ -184,11 +184,11 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord &r) const
     const uint8_t *textPtr = r.payload + 1 + langLen;
     size_t textLen = r.payloadLen - 1 - langLen;
 
-    Logger::LogInfo(F("NDEF Text: ("), false);
-    Logger::LogInfo(utf16 ? F("UTF-16") : F("UTF-8"), false);
-    Logger::LogInfo(F(", "), false);
-    Logger::LogInfo(lang, false);
-    Logger::LogInfo(F(")"));
+    Logger::LogDebug(F("NDEF Text: ("), false);
+    Logger::LogDebug(utf16 ? F("UTF-16") : F("UTF-8"), false);
+    Logger::LogDebug(F(", "), false);
+    Logger::LogDebug(lang, false);
+    Logger::LogDebug(F(")"));
     Logger::LogInfo(F("Text payload:"));
     if (utf16)
     {
@@ -207,9 +207,9 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord &r) const
 
 void NdefHelper::dumpHexAscii(const uint8_t *data, size_t len) const
 {
-    Logger::LogInfo(F("Data ("), false);
-    Logger::LogInfo(len, false);
-    Logger::LogInfo(F(" bytes):"));
+    Logger::LogDebug(F("Data ("), false);
+    Logger::LogDebug(len, false);
+    Logger::LogDebug(F(" bytes):"));
     for (size_t i = 0; i < len; i += 16)
     {
         Logger::logf("%04u: ", (unsigned)i);

@@ -33,7 +33,7 @@ static NdefHelper ndefHelper;
 
 void setup()
 {
-    Logger::begin(115200);
+    Logger::begin(115200, true );
 
     // Setup Card Reader
 
@@ -60,7 +60,8 @@ void setup()
     nfc.SAMConfig();
     nfc.setPassiveActivationRetries(0xFF);
 
-    Logger::LogInfo(F("Waiting for an ISO14443A Card ..."));
+    Logger::LogInfo("Initialized");
+    Logger::LogDebug(F("Waiting for an ISO14443A Card ..."));
 }
 
 void loop()
@@ -84,47 +85,46 @@ void loop()
             lastUidLength = uidLength;
             memcpy(lastUid, uid, uidLength);
 
-            Logger::LogInfo(F("Tag detected. UID length: "), false);
-            Logger::LogInfo(uidLength);
-            Logger::LogInfo(F("UID: "), false);
+            Logger::LogDebug(F("Tag detected. UID length: "), false);
+            Logger::LogDebug(uidLength);
+            Logger::LogDebug(F("UID: "), false);
             nfc.PrintHex(uid, uidLength);
 
             // --- 1) CC lesen & interpretieren ---
             Type2TagReader::TagInfo ti{};
             if (!tagReader.readCapabilityContainer(ti))
             {
-                Logger::LogInfo(F("Failed to read Capability Container (page 3)"));
+                Logger::LogWarn(F("Failed to read Capability Container (page 3)"));
                 return;
             }
 
-            Logger::LogInfo(F("CC: Magic=0x"), false);
-            Logger::LogInfo(ti.ccMagic, false, HEX);
-            Logger::LogInfo(F(", Ver="), false);
-            Logger::LogInfo(ti.verMaj, false);
-            Logger::LogInfo('.', false);
-            Logger::LogInfo(ti.verMin, false);
-            Logger::LogInfo(F(", Size8=0x"), false);
-            Logger::LogInfo(ti.size8, false, HEX);
-            Logger::LogInfo(F(" ("), false);
-            Logger::LogInfo(ti.userBytes, false);
-            Logger::LogInfo(F(" bytes user)"), false);
-            Logger::LogInfo(F(", Access=0x"), false);
-            Logger::LogInfo(ti.access, false, HEX);
-            Logger::LogInfo();
+            Logger::LogDebug(F("CC: Magic=0x"), false);
+            Logger::LogDebug(ti.ccMagic, false, HEX);
+            Logger::LogDebug(F(", Ver="), false);
+            Logger::LogDebug(ti.verMaj, false);
+            Logger::LogDebug('.', false);
+            Logger::LogDebug(ti.verMin, false);
+            Logger::LogDebug(F(", Size8=0x"), false);
+            Logger::LogDebug(ti.size8, false, HEX);
+            Logger::LogDebug(F(" ("), false);
+            Logger::LogDebug(ti.userBytes, false);
+            Logger::LogDebug(F(" bytes user)"), false);
+            Logger::LogDebug(F(", Access=0x"), false);
+            Logger::LogDebug(ti.access, false, HEX);
 
             if (!ti.ccValid)
             {
-                Logger::LogInfo(F("Warning: CC Magic != 0xE1 (evtl. kein NDEF-Tag oder CC korrupt)"));
+                Logger::LogWarn(F("Warning: CC Magic != 0xE1 (evtl. kein NDEF-Tag oder CC korrupt)"));
             }
 
-            Logger::LogInfo(F("Probable type: "));
-            Logger::LogInfo(ti.probableType);
+            Logger::LogDebug(F("Probable type: "));
+            Logger::LogDebug(ti.probableType);
 
             // --- 2) User Memory vollständig lesen (dynamisch) ---
             static uint8_t user[kUserMaxBytes];
             if (!tagReader.readUserMemory(user, sizeof(user), ti))
             {
-                Logger::LogInfo(F("Failed to read user memory"));
+                Logger::LogError(F("Failed to read user memory"));
                 return;
             }
 
@@ -137,8 +137,8 @@ void loop()
 
             if (foundNdef)
             {
-                Logger::LogInfo(F("NDEF length (TLV): "), false);
-                Logger::LogInfo(static_cast<unsigned>(tlv.length));
+                Logger::LogDebug(F("NDEF length (TLV): "), false);
+                Logger::LogDebug(static_cast<unsigned>(tlv.length));
 
                 // --- 4) Ersten NDEF-Record parsen & bei Text ausgeben ---
                 NdefHelper::NdefRecord rec{};
@@ -151,19 +151,19 @@ void loop()
                     }
                     else
                     {
-                        Logger::LogInfo(F("First NDEF record is not a Text (RTD/T) record."));
-                        Logger::LogInfo(F("Record header / payload (hex):"));
+                        Logger::LogWarn(F("First NDEF record is not a Text (RTD/T) record."));
+                        Logger::LogWarn(F("Record header / payload (hex):"));
                         ndefHelper.dumpHexAscii(tlv.value, tlv.length);
                     }
                 }
                 else
                 {
-                    Logger::LogInfo(F("Failed to parse first NDEF record"));
+                    Logger::LogWarn(F("Failed to parse first NDEF record"));
                 }
             }
             else
             {
-                Logger::LogInfo(F("No NDEF TLV found (0x03)"));
+                Logger::LogWarn(F("No NDEF TLV found (0x03)"));
             }
         }
     }
@@ -172,7 +172,7 @@ void loop()
         tagPresent = false;
         lastUidLength = 0;
         memset(lastUid, 0, sizeof(lastUid));
-        Logger::LogInfo(F("Tag removed"));
+        Logger::LogDebug(F("Tag removed"));
     }
 
     delay(250);

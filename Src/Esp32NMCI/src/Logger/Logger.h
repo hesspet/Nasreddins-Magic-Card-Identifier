@@ -127,7 +127,7 @@ public:
      * @endcode
      */
     template <typename T>
-    static void logWarn(const T &value, bool newline = true, int base = kNoBase)
+    static void LogWarn(const T &value, bool newline = true, int base = kNoBase)
     {
         log(value, newline, base, Level::Warn);
     }
@@ -141,7 +141,7 @@ public:
      * @endcode
      */
     template <typename T>
-    static void logError(const T &value, bool newline = true, int base = kNoBase)
+    static void LogError(const T &value, bool newline = true, int base = kNoBase)
     {
         log(value, newline, base, Level::Error);
     }
@@ -156,7 +156,7 @@ public:
      * @endcode
      */
     template <typename T>
-    static void logDebug(const T &value, bool newline = true, int base = kNoBase)
+    static void LogDebug(const T &value, bool newline = true, int base = kNoBase)
     {
         log(value, newline, base, Level::Debug);
     }
