@@ -3,8 +3,9 @@
 #include <cstring>
 
 bool Logger::s_atLineStart = true;
+Logger::Level Logger::s_filterLevel = Logger::Level::Debug;
 
-void Logger::begin(unsigned long baudRate, bool waitForSerial)
+void Logger::begin(unsigned long baudRate, bool waitForSerial, Level filterLevel)
 {
     Serial.begin(baudRate);
     if (waitForSerial)
@@ -14,11 +15,16 @@ void Logger::begin(unsigned long baudRate, bool waitForSerial)
             delay(100);
         }
     }
+    s_filterLevel = filterLevel;
     s_atLineStart = true;
 }
 
 void Logger::log()
 {
+    if (!isLevelEnabled(Level::Info))
+    {
+        return;
+    }
     Serial.println();
     s_atLineStart = true;
 }
@@ -63,4 +69,25 @@ bool Logger::formatEndsWithNewline(const char *format)
 
     const char *lastNewline = std::strrchr(format, '\n');
     return lastNewline != nullptr && lastNewline[1] == '\0';
+}
+
+bool Logger::isLevelEnabled(Level level)
+{
+    return levelPriority(level) >= levelPriority(s_filterLevel);
+}
+
+uint8_t Logger::levelPriority(Level level)
+{
+    switch (level)
+    {
+    case Level::Error:
+        return 4;
+    case Level::Warn:
+        return 3;
+    case Level::Info:
+        return 2;
+    case Level::Debug:
+    default:
+        return 1;
+    }
 }

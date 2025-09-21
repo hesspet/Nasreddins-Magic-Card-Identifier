@@ -29,8 +29,11 @@ public:
      *
      * @param baudRate Desired baud rate for the serial port.
      * @param waitForSerial When true, blocks until the serial port becomes available.
+     * @param filterLevel Minimum severity level that will be emitted. Defaults to
+     *        Logger::Level::Debug to allow full output.
      */
-    static void begin(unsigned long baudRate = 115200, bool waitForSerial = true);
+    static void begin(unsigned long baudRate = 115200, bool waitForSerial = true,
+                      Level filterLevel = Level::Debug);
 
     /**
      * @brief Emits an empty log line, separating two messages.
@@ -60,6 +63,10 @@ public:
     static typename std::enable_if<std::is_arithmetic<typename std::decay<T>::type>::value>::type log(
         const T &value, bool newline = true, int base = kNoBase, Level level = Level::Info)
     {
+        if (!isLevelEnabled(level))
+        {
+            return;
+        }
         if (base == kNoBase)
         {
             printValue(value, newline, level);
@@ -84,6 +91,10 @@ public:
         const T &value, bool newline = true, int base = kNoBase, Level level = Level::Info)
     {
         (void)base;
+        if (!isLevelEnabled(level))
+        {
+            return;
+        }
         printValue(value, newline, level);
     }
 
@@ -161,6 +172,10 @@ public:
     template <typename... Args>
     static void logf(Level level, const char *format, Args... args)
     {
+        if (!isLevelEnabled(level))
+        {
+            return;
+        }
         if (s_atLineStart)
         {
             printPrefix(level);
@@ -236,6 +251,9 @@ private:
 
     static void printPrefix(Level level);
     static bool formatEndsWithNewline(const char *format);
+    static bool isLevelEnabled(Level level);
+    static uint8_t levelPriority(Level level);
 
     static bool s_atLineStart;
+    static Level s_filterLevel;
 };
