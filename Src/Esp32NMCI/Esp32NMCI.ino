@@ -84,5 +84,6 @@ void setup()
 void loop()
 {
 	cardReaderManager.process();
+	displayManager.update();
 }
 

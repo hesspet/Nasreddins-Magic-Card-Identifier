@@ -1,3 +1,4 @@
+#include <Arduino.h>
 #include <TFT_eSPI.h>
 #include <SPI.h>
 #include "DisplayManager.h"
@@ -32,11 +33,11 @@ void DisplayManager::begin(Orientation orientation)
     showMessage("Hello", false);
 }
 
-void DisplayManager::showMessage(const String& message, bool withOverlay)
+void DisplayManager::renderSingleMessage(const String& message, uint16_t textColor)
 {
     tft.fillScreen(TFT_BLACK);
     tft.setTextDatum(MC_DATUM); // Mitte zentriert
-    tft.setTextColor(TFT_GREEN, TFT_BLACK);
+    tft.setTextColor(textColor, TFT_BLACK);
 
     // Maximale Displaygröße
     int maxWidth = tft.width() - 10;   // etwas Rand lassen
@@ -62,15 +63,23 @@ void DisplayManager::showMessage(const String& message, bool withOverlay)
     // drawStatusOverlay();  // Sprite neu zeichnen
 }
 
-void DisplayManager::showMessage(const std::vector<String>& messages)
+void DisplayManager::showMessage(const String& message, bool withOverlay)
+{
+    renderSingleMessage(message, TFT_GREEN);
+
+    std::vector<String> displayedLines;
+    displayedLines.push_back(message);
+    rememberMessage(displayedLines, false);
+}
+
+void DisplayManager::renderMultipleMessages(const std::vector<String>& messages, uint16_t textColor)
 {
     tft.fillScreen(TFT_BLACK);
     tft.setTextDatum(MC_DATUM);
-    tft.setTextColor(TFT_GREEN, TFT_BLACK);
+    tft.setTextColor(textColor, TFT_BLACK);
 
     if (messages.empty())
     {
-        showMessage(String("no data in record 1"));
         return;
     }
 
@@ -120,4 +129,54 @@ void DisplayManager::showMessage(const std::vector<String>& messages)
     {
         tft.drawString(messages[i], tft.width() / 2, startY + (lineHeight * static_cast<int16_t>(i)));
     }
+}
+
+void DisplayManager::showMessage(const std::vector<String>& messages)
+{
+    if (messages.empty())
+    {
+        showMessage(String("no data in record 1"));
+        return;
+    }
+
+    constexpr uint8_t maxLines = 3;
+    const size_t lineCount = messages.size() < maxLines ? messages.size() : maxLines;
+
+    std::vector<String> displayedLines(messages.begin(), messages.begin() + lineCount);
+    renderMultipleMessages(displayedLines, TFT_GREEN);
+    rememberMessage(displayedLines, true);
+}
+
+void DisplayManager::rememberMessage(const std::vector<String>& messages, bool isList)
+{
+    lastDisplayedLines = messages;
+    lastMessageWasList = isList;
+    lastMessageValid = !messages.empty();
+    lastMessageCurrentlyGreen = lastMessageValid;
+    lastMessageTimestamp = millis();
+}
+
+void DisplayManager::update()
+{
+    if (!lastMessageValid || !lastMessageCurrentlyGreen)
+    {
+        return;
+    }
+
+    const uint32_t now = millis();
+    if ((now - lastMessageTimestamp) < MessageDimDelayMs)
+    {
+        return;
+    }
+
+    if (lastMessageWasList)
+    {
+        renderMultipleMessages(lastDisplayedLines, TFT_DARKGREY);
+    }
+    else if (!lastDisplayedLines.empty())
+    {
+        renderSingleMessage(lastDisplayedLines.front(), TFT_DARKGREY);
+    }
+
+    lastMessageCurrentlyGreen = false;
 }
