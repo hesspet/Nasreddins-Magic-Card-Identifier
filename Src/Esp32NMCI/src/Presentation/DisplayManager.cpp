@@ -92,7 +92,23 @@ void DisplayManager::renderMultipleMessages(const std::vector<String>& messages,
 	}
 
 	constexpr uint8_t maxLines = 3;
+	constexpr size_t maxCharactersPerLine = 12;
 	const size_t lineCount = messages.size() < maxLines ? messages.size() : maxLines;
+
+	std::vector<String> truncatedMessages;
+	truncatedMessages.reserve(lineCount);
+	for (size_t i = 0; i < lineCount; ++i)
+	{
+		const String& message = messages[i];
+		if (message.length() > maxCharactersPerLine)
+		{
+			truncatedMessages.emplace_back(message.substring(0, maxCharactersPerLine));
+		}
+		else
+		{
+			truncatedMessages.emplace_back(message);
+		}
+	}
 
 	const int16_t margin = 10;
 	const int16_t availableWidth = tft.width() - (margin * 2);
@@ -113,7 +129,7 @@ void DisplayManager::renderMultipleMessages(const std::vector<String>& messages,
 		bool fits = true;
 		for (size_t i = 0; i < lineCount; ++i)
 		{
-			if (tft.textWidth(messages[i]) > availableWidth)
+			if (tft.textWidth(truncatedMessages[i]) > availableWidth)
 			{
 				fits = false;
 				break;
@@ -135,7 +151,7 @@ void DisplayManager::renderMultipleMessages(const std::vector<String>& messages,
 
 	for (size_t i = 0; i < lineCount; ++i)
 	{
-		tft.drawString(messages[i], tft.width() / 2, startY + (lineHeight * static_cast<int16_t>(i)));
+		tft.drawString(truncatedMessages[i], tft.width() / 2, startY + (lineHeight * static_cast<int16_t>(i)));
 	}
 }
 
