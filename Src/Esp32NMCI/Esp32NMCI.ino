@@ -65,6 +65,37 @@ static void OnPayloadRead(const NdefHelper::NdefRecord &record)
     {
         Logger::LogWarn(F("First NDEF record is not a Text (RTD/T) record."));
         Logger::LogInfo(F("Payload (hex):"));
-        ndefHelper.dumpHexAscii(record.payload, record.payloadLen);
+        const String payloadDump = ndefHelper.getString(record.payload, record.payloadLen);
+        int lineStart = 0;
+        bool firstLine = true;
+        while (lineStart < payloadDump.length())
+        {
+            int lineEnd = payloadDump.indexOf('\n', lineStart);
+            String line = (lineEnd == -1) ? payloadDump.substring(lineStart)
+                                          : payloadDump.substring(lineStart, lineEnd);
+            if (line.length() > 0)
+            {
+                if (firstLine)
+                {
+                    Logger::LogDebug(line);
+                }
+                else
+                {
+                    Logger::LogInfo(line);
+                }
+            }
+            else
+            {
+                Logger::LogInfo();
+            }
+
+            firstLine = false;
+
+            if (lineEnd == -1)
+            {
+                break;
+            }
+            lineStart = lineEnd + 1;
+        }
     }
 }

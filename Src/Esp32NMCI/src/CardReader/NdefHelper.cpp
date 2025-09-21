@@ -1,6 +1,7 @@
 #include "NdefHelper.h"
 #include "../Logger/Logger.h"
 #include <ctype.h>
+#include <stdio.h>
 
 bool NdefHelper::parseNextTlv(const uint8_t *start, const uint8_t *end, Tlv &out) const
 {
@@ -192,7 +193,38 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord &r) const
     Logger::LogInfo(F("Text payload:"));
     if (utf16)
     {
-        dumpHexAscii(textPtr, textLen);
+        const String hexDump = getString(textPtr, textLen);
+        int lineStart = 0;
+        bool firstLine = true;
+        while (lineStart < hexDump.length())
+        {
+            int lineEnd = hexDump.indexOf('\n', lineStart);
+            String line = (lineEnd == -1) ? hexDump.substring(lineStart)
+                                          : hexDump.substring(lineStart, lineEnd);
+            if (line.length() > 0)
+            {
+                if (firstLine)
+                {
+                    Logger::LogDebug(line);
+                }
+                else
+                {
+                    Logger::LogInfo(line);
+                }
+            }
+            else
+            {
+                Logger::LogInfo();
+            }
+
+            firstLine = false;
+
+            if (lineEnd == -1)
+            {
+                break;
+            }
+            lineStart = lineEnd + 1;
+        }
     }
     else
     {
@@ -205,31 +237,48 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord &r) const
     }
 }
 
-void NdefHelper::dumpHexAscii(const uint8_t *data, size_t len) const
+String NdefHelper::getString(const uint8_t *data, size_t len) const
 {
-    Logger::LogDebug(F("Data ("), false);
-    Logger::LogDebug(len, false);
-    Logger::LogDebug(F(" bytes):"));
+    String output;
+    size_t estimated = len > 0 ? (((len + 15) / 16) * 80) + 32 : 32;
+    output.reserve(estimated);
+    output += F("Data (");
+    output += len;
+    output += F(" bytes):\n");
+
+    if (!data || len == 0)
+    {
+        return output;
+    }
+
     for (size_t i = 0; i < len; i += 16)
     {
-        Logger::logf("%04u: ", (unsigned)i);
+        char offsetBuffer[8];
+        snprintf(offsetBuffer, sizeof(offsetBuffer), "%04u: ", static_cast<unsigned int>(i));
+        output += offsetBuffer;
+
         for (size_t j = 0; j < 16; ++j)
         {
             if (i + j < len)
             {
-                Logger::logf("%02X ", data[i + j]);
+                char hexBuffer[4];
+                snprintf(hexBuffer, sizeof(hexBuffer), "%02X ", data[i + j]);
+                output += hexBuffer;
             }
             else
             {
-                Logger::LogInfo("   ", false);
+                output += F("   ");
             }
         }
-        Logger::LogInfo(" | ", false);
+
+        output += F(" | ");
         for (size_t j = 0; j < 16 && (i + j) < len; ++j)
         {
-            char c = (char)data[i + j];
-            Logger::LogInfo(isprint((unsigned char)c) ? c : '.', false);
+            char c = static_cast<char>(data[i + j]);
+            output += static_cast<char>(isprint(static_cast<unsigned char>(c)) ? c : '.');
         }
-        Logger::LogInfo();
+        output += '\n';
     }
+
+    return output;
 }

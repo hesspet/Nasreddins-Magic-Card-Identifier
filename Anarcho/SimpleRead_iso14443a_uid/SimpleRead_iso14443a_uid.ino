@@ -113,8 +113,8 @@ void loop() {
 				return;
 			}
 
-			// Optional: Rohdump
-			// ndefHelper.dumpHexAscii(user, ti.userBytes);
+                        // Optional: Rohdump
+                        // Serial.print(ndefHelper.getString(user, ti.userBytes));
 
 			// --- 3) TLV scannen: NDEF (0x03) finden ---
 			NdefHelper::Tlv tlv{};
@@ -133,8 +133,8 @@ void loop() {
 					}
 					else {
 						Serial.println(F("First NDEF record is not a Text (RTD/T) record."));
-						Serial.println(F("Record header / payload (hex):"));
-						ndefHelper.dumpHexAscii(tlv.value, tlv.length);
+                                                Serial.println(F("Record header / payload (hex):"));
+                                                Serial.print(ndefHelper.getString(tlv.value, tlv.length));
 					}
 				}
 				else {

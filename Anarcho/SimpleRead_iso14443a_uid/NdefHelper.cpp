@@ -1,6 +1,7 @@
 #include "NdefHelper.h"
 
 #include <ctype.h>
+#include <stdio.h>
 
 bool NdefHelper::parseNextTlv(const uint8_t* start, const uint8_t* end, Tlv& out) const {
 	if (!start || start >= end) return false;
@@ -152,11 +153,12 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord& r) const {
 	Serial.print(F(", "));
 	Serial.print(lang);
 	Serial.println(F(")"));
-	Serial.println(F("Text payload:"));
-	if (utf16) {
-		dumpHexAscii(textPtr, textLen);
-	}
-	else {
+        Serial.println(F("Text payload:"));
+        if (utf16) {
+                String hexDump = getString(textPtr, textLen);
+                Serial.print(hexDump);
+        }
+        else {
 		for (size_t i = 0; i < textLen; ++i) {
 			char c = (char)textPtr[i];
 			Serial.print(isprint((unsigned char)c) ? c : '.');
@@ -165,25 +167,41 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord& r) const {
 	}
 }
 
-void NdefHelper::dumpHexAscii(const uint8_t* data, size_t len) const {
-	Serial.print(F("Data ("));
-	Serial.print(len);
-	Serial.println(F(" bytes):"));
-	for (size_t i = 0; i < len; i += 16) {
-		Serial.printf("%04u: ", (unsigned)i);
-		for (size_t j = 0; j < 16; ++j) {
-			if (i + j < len) {
-				Serial.printf("%02X ", data[i + j]);
-			}
-			else {
-				Serial.print("   ");
-			}
-		}
-		Serial.print(" | ");
-		for (size_t j = 0; j < 16 && (i + j) < len; ++j) {
-			char c = (char)data[i + j];
-			Serial.print(isprint((unsigned char)c) ? c : '.');
-		}
-		Serial.println();
-	}
+String NdefHelper::getString(const uint8_t* data, size_t len) const {
+        String output;
+        size_t estimated = len > 0 ? (((len + 15) / 16) * 80) + 32 : 32;
+        output.reserve(estimated);
+        output += F("Data (");
+        output += len;
+        output += F(" bytes):\n");
+
+        if (!data || len == 0) {
+                return output;
+        }
+
+        for (size_t i = 0; i < len; i += 16) {
+                char offsetBuffer[8];
+                snprintf(offsetBuffer, sizeof(offsetBuffer), "%04u: ", (unsigned)i);
+                output += offsetBuffer;
+
+                for (size_t j = 0; j < 16; ++j) {
+                        if (i + j < len) {
+                                char hexBuffer[4];
+                                snprintf(hexBuffer, sizeof(hexBuffer), "%02X ", data[i + j]);
+                                output += hexBuffer;
+                        }
+                        else {
+                                output += F("   ");
+                        }
+                }
+
+                output += F(" | ");
+                for (size_t j = 0; j < 16 && (i + j) < len; ++j) {
+                        char c = (char)data[i + j];
+                        output += (char)(isprint((unsigned char)c) ? c : '.');
+                }
+                output += '\n';
+        }
+
+        return output;
 }
