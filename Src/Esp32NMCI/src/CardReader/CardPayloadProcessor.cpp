@@ -2,71 +2,77 @@
 
 #include "../Logger/Logger.h"
 
-String CardPayloadProcessor::ProcessPayload(const String &payload)
+namespace
 {
-    int lineStart = 0;
-    bool firstLine = true;
-    bool appendNewline = false;
-    String result;
-    const bool endsWithNewline = payload.length() > 0 && payload.charAt(payload.length() - 1) == '\n';
-
-    while (lineStart < payload.length())
-    {
-        int retFlag;
-        const String lineResult = ProcessPayloadLine(payload, lineStart, firstLine, retFlag);
-
-        if (appendNewline)
-        {
-            result += '\n';
-        }
-
-        result += lineResult;
-        appendNewline = true;
-
-        if (retFlag == 2) break;
-    }
-
-    if (endsWithNewline)
-    {
-        result += '\n';
-    }
-
-    return result;
+constexpr size_t kMaxElements = 5;
 }
 
-String CardPayloadProcessor::ProcessPayloadLine(const String &payload, int &lineStart, bool &firstLine, int &retFlag)
+std::vector<String> CardPayloadProcessor::ProcessPayload(const String &payload)
 {
-    retFlag = 1;
-    int lineEnd = payload.indexOf('\n', lineStart);
-    String line = (lineEnd == -1) ? payload.substring(lineStart)
-                                  : payload.substring(lineStart, lineEnd);
+    std::vector<String> elements;
+    elements.reserve(kMaxElements);
 
-    if (line.length() > 0)
+    String trimmedPayload = payload;
+    trimmedPayload.trim();
+
+    if (trimmedPayload.length() == 0)
     {
-        if (firstLine)
+        return elements;
+    }
+
+    // Enforce a single line payload by discarding everything after the first newline.
+    int newlineIndex = trimmedPayload.indexOf('\n');
+    int carriageReturnIndex = trimmedPayload.indexOf('\r');
+    int firstLineBreak = -1;
+
+    if (newlineIndex != -1)
+    {
+        firstLineBreak = newlineIndex;
+    }
+
+    if (carriageReturnIndex != -1 && (firstLineBreak == -1 || carriageReturnIndex < firstLineBreak))
+    {
+        firstLineBreak = carriageReturnIndex;
+    }
+
+    if (firstLineBreak != -1)
+    {
+        Logger::LogWarn(F("Payload contains multiple rows; ignoring additional lines."));
+        trimmedPayload = trimmedPayload.substring(0, firstLineBreak);
+        trimmedPayload.trim();
+
+        if (trimmedPayload.length() == 0)
         {
-            Logger::LogDebug(line);
+            return elements;
+        }
+    }
+
+    int start = 0;
+
+    while (start < trimmedPayload.length() && elements.size() < kMaxElements)
+    {
+        const int delimiterIndex = trimmedPayload.indexOf(',', start);
+        String value;
+
+        if (delimiterIndex == -1)
+        {
+            value = trimmedPayload.substring(start);
+            start = trimmedPayload.length();
         }
         else
         {
-            Logger::LogInfo(line);
+            value = trimmedPayload.substring(start, delimiterIndex);
+            start = delimiterIndex + 1;
         }
-    }
-    else
-    {
-        Logger::LogInfo();
+
+        value.trim();
+        elements.push_back(value);
     }
 
-    firstLine = false;
-
-    if (lineEnd == -1)
+    if (start < trimmedPayload.length())
     {
-        retFlag = 2;
-    }
-    else
-    {
-        lineStart = lineEnd + 1;
+        Logger::LogWarn(F("Payload exceeded maximum element count (5); remaining values ignored."));
     }
 
-    return line;
+    return elements;
 }
