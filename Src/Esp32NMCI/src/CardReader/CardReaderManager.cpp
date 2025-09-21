@@ -112,7 +112,7 @@ void CardReaderManager::handleTagDetected(const uint8_t *uid, uint8_t uidLength)
 
     if (!tagReader_.readUserMemory(userMemory_, sizeof(userMemory_), ti))
     {
-        Logger::LogError(F("Failed to read user memory"));
+        Logger::LogError(F("Failed to read user memory"), true, Logger::kNoBase, true);
         return;
     }
 

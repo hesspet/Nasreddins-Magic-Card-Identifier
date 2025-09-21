@@ -3,6 +3,8 @@
 #include <Arduino.h>
 #include <type_traits>
 
+#include "../Presentation/DisplayManager.h"
+
 class Logger
 {
 public:
@@ -34,6 +36,8 @@ public:
      */
     static void begin(unsigned long baudRate = 115200, bool waitForSerial = true,
                       Level filterLevel = Level::Debug);
+
+    static void setDisplayManager(DisplayManager *displayManager);
 
     /**
      * @brief Emits an empty log line, separating two messages.
@@ -127,9 +131,11 @@ public:
      * @endcode
      */
     template <typename T>
-    static void LogWarn(const T &value, bool newline = true, int base = kNoBase)
+    static void LogWarn(const T &value, bool newline = true, int base = kNoBase,
+                        bool showOnDisplay = false)
     {
         log(value, newline, base, Level::Warn);
+        handleDisplayOutput(value, base, showOnDisplay);
     }
 
     /**
@@ -141,9 +147,11 @@ public:
      * @endcode
      */
     template <typename T>
-    static void LogError(const T &value, bool newline = true, int base = kNoBase)
+    static void LogError(const T &value, bool newline = true, int base = kNoBase,
+                         bool showOnDisplay = false)
     {
         log(value, newline, base, Level::Error);
+        handleDisplayOutput(value, base, showOnDisplay);
     }
 
     /**
@@ -274,6 +282,37 @@ private:
     static bool isLevelEnabled(Level level);
     static uint8_t levelPriority(Level level);
 
+    template <typename T>
+    static void handleDisplayOutput(const T &value, int base, bool showOnDisplay)
+    {
+        if (!showOnDisplay || s_displayManager == nullptr)
+        {
+            return;
+        }
+
+        s_displayManager->showError(makeDisplayString(value, base));
+    }
+
+    template <typename T>
+    static typename std::enable_if<std::is_integral<typename std::decay<T>::type>::value, String>::type
+    makeDisplayString(const T &value, int base)
+    {
+        if (base != kNoBase)
+        {
+            return String(value, static_cast<unsigned char>(base));
+        }
+        return String(value);
+    }
+
+    template <typename T>
+    static typename std::enable_if<!std::is_integral<typename std::decay<T>::type>::value, String>::type
+    makeDisplayString(const T &value, int base)
+    {
+        (void)base;
+        return String(value);
+    }
+
     static bool s_atLineStart;
     static Level s_filterLevel;
+    static DisplayManager *s_displayManager;
 };
