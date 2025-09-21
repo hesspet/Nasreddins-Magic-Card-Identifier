@@ -40,7 +40,7 @@
       <Filter>Src\CardReader</Filter>
     </ClCompile>
     <ClCompile Include="src\Presentation\DisplayManager.cpp">
-      <Filter>Src</Filter>
+      <Filter>Src\Presentation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -65,9 +65,11 @@
     <ClInclude Include="src\CardReader\CardPayloadProcessor.h">
       <Filter>Src\CardReader</Filter>
     </ClInclude>
-    <ClInclude Include="src\Presentation\DisplayManager.h" />
     <ClInclude Include="src\config.h">
       <Filter>Src</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Presentation\DisplayManager.h">
+      <Filter>Src\Presentation</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

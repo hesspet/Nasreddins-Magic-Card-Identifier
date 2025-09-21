@@ -16,6 +16,7 @@ public:
     void begin(Orientation orientation = Orientation::UsbRight);
     void showMessage(const String& message, bool withOverlay = true);
     void showMessage(const std::vector<String>& messages);
+    void showError(const String& message, bool withOverlay = true);
     void update();
 
 private:

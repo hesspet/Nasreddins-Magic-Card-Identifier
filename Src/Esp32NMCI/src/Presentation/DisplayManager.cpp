@@ -65,6 +65,11 @@ void DisplayManager::renderSingleMessage(const String& message, uint16_t textCol
 	// drawStatusOverlay();  // Sprite neu zeichnen
 }
 
+void DisplayManager::showError(const String& message, bool withOverlay)
+{
+	// todo implement
+}
+
 void DisplayManager::showMessage(const String& message, bool withOverlay)
 {
 	renderSingleMessage(message, TFT_GREEN);
