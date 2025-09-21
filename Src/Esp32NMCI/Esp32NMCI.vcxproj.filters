@@ -15,6 +15,9 @@
     <Filter Include="Src\Presentation">
       <UniqueIdentifier>{c683c9dc-6868-499e-912f-bfef438bd100}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Logger">
+      <UniqueIdentifier>{05281ed2-16e4-4191-9fbf-da97fb3bc6de}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Esp32NMCI.ino" />
@@ -26,6 +29,9 @@
     </ClCompile>
     <ClCompile Include="src\Presentation\ButtonManager.cpp">
       <Filter>Src\Presentation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logger\Logger.cpp">
+      <Filter>Src\Logger</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -41,6 +47,9 @@
     <ClInclude Include="..\..\config.h" />
     <ClInclude Include="src\Presentation\ButtonManager.h">
       <Filter>Src\Presentation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logger\Logger.h">
+      <Filter>Src\Logger</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

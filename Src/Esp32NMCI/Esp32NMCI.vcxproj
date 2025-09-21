@@ -80,12 +80,14 @@
     </ClCompile>
     <ClCompile Include="src\CardReader\NdefHelper.cpp" />
     <ClCompile Include="src\CardReader\Type2TagReader.cpp" />
+    <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\Presentation\ButtonManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\config.h" />
     <ClInclude Include="src\CardReader\NdefHelper.h" />
     <ClInclude Include="src\CardReader\Type2TagReader.h" />
+    <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\Presentation\ButtonManager.h" />
     <ClInclude Include="__vm\.Esp32NMCI.vsarduino.h" />
   </ItemGroup>
