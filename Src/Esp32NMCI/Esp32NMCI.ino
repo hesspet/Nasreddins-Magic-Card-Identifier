@@ -67,7 +67,7 @@ static void OnNewData(const String& payloadText)
 		Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
 	}
 
-	// add here showMessage with vector
+	displayManager.showMessage(ListElementsInPayloadFromCard);
 
 }
 
