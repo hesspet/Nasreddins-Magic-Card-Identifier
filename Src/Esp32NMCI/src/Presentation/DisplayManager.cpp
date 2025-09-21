@@ -11,6 +11,7 @@ void DisplayManager::begin()
 }
 
 void DisplayManager::showMessage(const String& message, bool withOverlay) {
+    
     tft.fillScreen(TFT_BLACK);
     tft.setTextDatum(MC_DATUM);  // Mitte zentriert
     tft.setTextColor(TFT_GREEN, TFT_BLACK);
