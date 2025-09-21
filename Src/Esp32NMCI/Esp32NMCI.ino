@@ -33,11 +33,17 @@ static Type2TagReader tagReader(nfc);
 static NdefHelper ndefHelper;
 static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
 static CardPayloadProcessor cardPayloadProcessor;
+static String lastProcessedPayload;
+
+static void OnNewData(const String &payloadText)
+{
+    lastProcessedPayload = cardPayloadProcessor.ProcessPayload(payloadText);
+}
 
 void setup()
 {
     Logger::begin(115200, true, Logger::Level::Info);
-    cardReaderManager.setNewDataCallback(CardPayloadProcessor::OnNewData);
+    cardReaderManager.setNewDataCallback(OnNewData);
     cardReaderManager.begin();
 }
 
