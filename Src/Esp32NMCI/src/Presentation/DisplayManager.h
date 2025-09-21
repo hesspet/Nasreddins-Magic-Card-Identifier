@@ -2,6 +2,7 @@
 #include <TFT_eSPI.h>
 #include <SPI.h>
 #include <stdint.h>
+#include <vector>
 
 class DisplayManager
 {
@@ -14,6 +15,7 @@ public:
 
     void begin(Orientation orientation = Orientation::UsbRight);
     void showMessage(const String& message, bool withOverlay = true);
+    void showMessage(const std::vector<String>& messages);
 
 private:
     TFT_eSPI tft = TFT_eSPI();
