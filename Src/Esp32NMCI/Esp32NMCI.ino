@@ -48,19 +48,16 @@ static void OnNewData(const String &payloadText)
     if (ListElementsInPayloadFromCard.empty())
     {
         Logger::LogWarn(F("Received empty card payload."));
+        displayManager.showMessage(ListElementsInPayloadFromCard);
         return;
     }
+
+    displayManager.showMessage(ListElementsInPayloadFromCard);
 
     Logger::LogInfo(F("Processed card payload values:"));
 
     for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
     {
-        if (index == 0) 
-        {
-            // Ausgabe des Kürzels
-            displayManager.showMessage(ListElementsInPayloadFromCard[index]);
-
-        }
         Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
     }
 
