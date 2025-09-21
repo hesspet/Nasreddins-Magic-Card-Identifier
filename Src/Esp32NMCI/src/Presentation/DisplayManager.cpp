@@ -67,7 +67,137 @@ void DisplayManager::renderSingleMessage(const String& message, uint16_t textCol
 
 void DisplayManager::showError(const String& message, bool withOverlay)
 {
-	// todo implement
+        (void)withOverlay;
+
+        tft.fillScreen(TFT_RED);
+        tft.setTextDatum(MC_DATUM);
+        tft.setTextColor(TFT_YELLOW, TFT_RED);
+
+        constexpr uint8_t maxLines = 3;
+        constexpr size_t maxCharactersPerLine = 12;
+
+        std::vector<String> lines;
+        lines.reserve(maxLines);
+
+        size_t start = 0;
+        const size_t length = message.length();
+
+        while (lines.size() < maxLines && start < length)
+        {
+                while (start < length)
+                {
+                        const char currentChar = message.charAt(start);
+                        if (currentChar == ' ' || currentChar == '\n' || currentChar == '\r' || currentChar == '\t')
+                        {
+                                ++start;
+                                continue;
+                        }
+                        break;
+                }
+
+                if (start >= length)
+                {
+                        break;
+                }
+
+                const size_t remaining = length - start;
+                size_t endExclusive = start + (remaining < maxCharactersPerLine ? remaining : maxCharactersPerLine);
+
+                const int newlineIndex = message.indexOf('\n', static_cast<unsigned int>(start));
+                int explicitBreakIndex = newlineIndex;
+
+                const int carriageReturnIndex = message.indexOf('\r', static_cast<unsigned int>(start));
+                if (carriageReturnIndex != -1)
+                {
+                        if (explicitBreakIndex == -1 || carriageReturnIndex < explicitBreakIndex)
+                        {
+                                explicitBreakIndex = carriageReturnIndex;
+                        }
+                }
+
+                if (explicitBreakIndex != -1 && static_cast<size_t>(explicitBreakIndex) < endExclusive)
+                {
+                        endExclusive = static_cast<size_t>(explicitBreakIndex);
+                }
+                else if (remaining > maxCharactersPerLine)
+                {
+                        const int spaceIndex = message.lastIndexOf(' ', static_cast<unsigned int>(endExclusive - 1));
+                        if (spaceIndex >= static_cast<int>(start))
+                        {
+                                endExclusive = static_cast<size_t>(spaceIndex);
+                        }
+                }
+
+                String line = message.substring(start, endExclusive);
+                line.trim();
+
+                if (line.length() > 0)
+                {
+                        lines.push_back(line);
+                }
+
+                start = endExclusive;
+        }
+
+        if (lines.empty())
+        {
+                lastDisplayedLines.clear();
+                lastMessageWasList = false;
+                lastMessageValid = false;
+                lastMessageCurrentlyGreen = false;
+                return;
+        }
+
+        const int16_t margin = 10;
+        const int16_t availableWidth = tft.width() - (margin * 2);
+        const int16_t availableHeight = tft.height() - (margin * 2);
+
+        int bestSize = 1;
+        for (int size = 1; size <= 8; ++size)
+        {
+                tft.setTextSize(size);
+                const int16_t lineHeight = 8 * size;
+                const int16_t totalHeight = lineHeight * maxLines;
+
+                if (totalHeight > availableHeight)
+                {
+                        break;
+                }
+
+                bool fits = true;
+                for (const auto& line : lines)
+                {
+                        if (tft.textWidth(line) > availableWidth)
+                        {
+                                fits = false;
+                                break;
+                        }
+                }
+
+                if (!fits)
+                {
+                        break;
+                }
+
+                bestSize = size;
+        }
+
+        tft.setTextSize(bestSize);
+
+        const size_t lineCount = lines.size();
+        const int16_t lineHeight = 8 * bestSize;
+        const int16_t totalVisibleHeight = lineHeight * static_cast<int16_t>(lineCount);
+        const int16_t startY = (tft.height() - totalVisibleHeight) / 2 + (lineHeight / 2);
+
+        for (size_t i = 0; i < lineCount; ++i)
+        {
+                tft.drawString(lines[i], tft.width() / 2, startY + (lineHeight * static_cast<int16_t>(i)));
+        }
+
+        lastDisplayedLines.clear();
+        lastMessageWasList = false;
+        lastMessageValid = false;
+        lastMessageCurrentlyGreen = false;
 }
 
 void DisplayManager::showMessage(const String& message, bool withOverlay)
