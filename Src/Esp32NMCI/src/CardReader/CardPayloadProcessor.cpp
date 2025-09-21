@@ -2,38 +2,39 @@
 
 #include "../Logger/Logger.h"
 
-CardPayloadProcessor *CardPayloadProcessor::instCardPayloadProcessor_ = nullptr;
-
-CardPayloadProcessor::CardPayloadProcessor()
-{
-    instCardPayloadProcessor_ = this;
-}
-
-void CardPayloadProcessor::OnNewData(const String &payloadText)
-{
-    if (!instCardPayloadProcessor_)
-    {
-        Logger::LogError(F("CardPayloadProcessor instance not initialized."));
-        return;
-    }
-
-    instCardPayloadProcessor_->ProcessPayload(payloadText);
-}
-
-void CardPayloadProcessor::ProcessPayload(const String &payload)
+String CardPayloadProcessor::ProcessPayload(const String &payload)
 {
     int lineStart = 0;
     bool firstLine = true;
+    bool appendNewline = false;
+    String result;
+    const bool endsWithNewline = payload.length() > 0 && payload.charAt(payload.length() - 1) == '\n';
 
     while (lineStart < payload.length())
     {
         int retFlag;
-        ProcessPayloadLine(payload, lineStart, firstLine, retFlag);
+        const String lineResult = ProcessPayloadLine(payload, lineStart, firstLine, retFlag);
+
+        if (appendNewline)
+        {
+            result += '\n';
+        }
+
+        result += lineResult;
+        appendNewline = true;
+
         if (retFlag == 2) break;
     }
+
+    if (endsWithNewline)
+    {
+        result += '\n';
+    }
+
+    return result;
 }
 
-void CardPayloadProcessor::ProcessPayloadLine(const String &payload, int &lineStart, bool &firstLine, int &retFlag)
+String CardPayloadProcessor::ProcessPayloadLine(const String &payload, int &lineStart, bool &firstLine, int &retFlag)
 {
     retFlag = 1;
     int lineEnd = payload.indexOf('\n', lineStart);
@@ -61,8 +62,11 @@ void CardPayloadProcessor::ProcessPayloadLine(const String &payload, int &lineSt
     if (lineEnd == -1)
     {
         retFlag = 2;
-        return;
+    }
+    else
+    {
+        lineStart = lineEnd + 1;
     }
 
-    lineStart = lineEnd + 1;
+    return line;
 }

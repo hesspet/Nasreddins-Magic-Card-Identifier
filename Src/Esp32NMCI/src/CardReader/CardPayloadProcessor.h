@@ -5,13 +5,10 @@
 class CardPayloadProcessor
 {
     public:
-    CardPayloadProcessor();
+    CardPayloadProcessor() = default;
 
-    static void OnNewData(const String &payloadText);
+    String ProcessPayload(const String &payload);
 
     private:
-    void ProcessPayload(const String &payload);
-    void ProcessPayloadLine(const String &payload, int &lineStart, bool &firstLine, int &retFlag);
-
-    static CardPayloadProcessor *instCardPayloadProcessor_;
+    String ProcessPayloadLine(const String &payload, int &lineStart, bool &firstLine, int &retFlag);
 };
