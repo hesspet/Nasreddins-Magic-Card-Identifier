@@ -12,6 +12,9 @@
     <Filter Include="Src\CardReader">
       <UniqueIdentifier>{f2b0a7e4-990a-405f-8195-f18100499310}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Presentation">
+      <UniqueIdentifier>{c683c9dc-6868-499e-912f-bfef438bd100}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Esp32NMCI.ino" />
@@ -20,6 +23,9 @@
     </ClCompile>
     <ClCompile Include="src\CardReader\Type2TagReader.cpp">
       <Filter>Src\CardReader</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Presentation\ButtonManager.cpp">
+      <Filter>Src\Presentation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -33,5 +39,8 @@
       <Filter>Src\CardReader</Filter>
     </ClInclude>
     <ClInclude Include="..\..\config.h" />
+    <ClInclude Include="src\Presentation\ButtonManager.h">
+      <Filter>Src\Presentation</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
