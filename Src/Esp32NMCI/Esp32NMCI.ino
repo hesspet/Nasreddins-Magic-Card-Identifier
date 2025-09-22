@@ -22,6 +22,7 @@
 #include <PN532.h>
 #include <PN532_HSU.h>
 #include <vector>
+#include <esp_sleep.h>
 
 #include "src/config.h"
 #include "src/CardReader/CardReaderManager.h"
@@ -30,6 +31,7 @@
 #include "src/CardReader/Type2TagReader.h"
 #include "src/Logger/Logger.h"
 #include "src/Presentation/DisplayManager.h"
+#include "src/Presentation/ButtonManager.h"
 
 
 /* Card Reader */
@@ -43,10 +45,13 @@ static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
 static CardPayloadProcessor cardPayloadProcessor;
 static std::vector<String> ListElementsInPayloadFromCard;
 static DisplayManager displayManager;
+constexpr int kButtonPin0 = 0;
+constexpr int kButtonPin35 = 35;
+static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
 
 static void OnNewData(const String& payloadText)
 {
-	ListElementsInPayloadFromCard = cardPayloadProcessor.ProcessPayload(payloadText);
+        ListElementsInPayloadFromCard = cardPayloadProcessor.ProcessPayload(payloadText);
 
 	if (ListElementsInPayloadFromCard.empty())
 	{
@@ -71,20 +76,30 @@ static void OnNewData(const String& payloadText)
 
 }
 
+static void EnterDeepSleep()
+{
+        Logger::LogInfo(F("[System] Entering deep sleep"));
+        esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 0);
+        esp_deep_sleep_start();
+}
+
 void setup()
 {
-	Logger::begin(115200, true, Logger::Level::Info);
+        Logger::begin(115200, true, Logger::Level::Info);
 
-	displayManager.begin(DisplayManager::Orientation::UsbLeft);
-	Logger::setDisplayManager(&displayManager);
+        displayManager.begin(DisplayManager::Orientation::UsbLeft);
+        Logger::setDisplayManager(&displayManager);
 
-	cardReaderManager.setNewDataCallback(OnNewData);
-	cardReaderManager.begin();
+        cardReaderManager.setNewDataCallback(OnNewData);
+        cardReaderManager.begin();
+        buttonManager.begin();
+        buttonManager.setOnButton35LongPressed(EnterDeepSleep);
 }
 
 void loop()
 {
-	cardReaderManager.process();
-	displayManager.update();
+        buttonManager.update();
+        cardReaderManager.process();
+        displayManager.update();
 }
 
