@@ -17,6 +17,7 @@ class ButtonManager
 
     void setOnButton0Pressed(std::function<void()> callback);
     void setOnButton35Pressed(std::function<void()> callback);
+    void setOnButton35LongPressed(std::function<void()> callback);
 
     private:
     int pinA;
@@ -28,6 +29,7 @@ class ButtonManager
 
     std::function<void()> onButton0Pressed = nullptr;
     std::function<void()> onButton35Pressed = nullptr;
+    std::function<void()> onButton35LongPressed = nullptr;
 
     unsigned long pressStart35 = 0;
     const unsigned long longPressThreshold = 7000; // ms

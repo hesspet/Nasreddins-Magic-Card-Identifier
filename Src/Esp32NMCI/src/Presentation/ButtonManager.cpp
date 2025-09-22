@@ -35,11 +35,20 @@ void ButtonManager::update()
     if (!stateB && lastStateB)
     {
         unsigned long duration = millis() - pressStart35;
-        if (duration < longPressThreshold && onButton35Pressed)
+        if (duration >= longPressThreshold)
+        {
+            if (onButton35LongPressed)
+            {
+                Logger::LogInfo(F("[ButtonManager] Button 35 long press"));
+                onButton35LongPressed();
+            }
+        }
+        else if (onButton35Pressed)
         {
             Logger::LogInfo(F("[ButtonManager] Button 35 short press"));
             onButton35Pressed();
         }
+        pressStart35 = 0;
     }
 }
 
@@ -66,4 +75,9 @@ void ButtonManager::setOnButton0Pressed(std::function<void()> callback)
 void ButtonManager::setOnButton35Pressed(std::function<void()> callback)
 {
     onButton35Pressed = callback;
+}
+
+void ButtonManager::setOnButton35LongPressed(std::function<void()> callback)
+{
+    onButton35LongPressed = callback;
 }
