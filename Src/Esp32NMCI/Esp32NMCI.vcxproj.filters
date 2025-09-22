@@ -18,6 +18,12 @@
     <Filter Include="Src\Logger">
       <UniqueIdentifier>{05281ed2-16e4-4191-9fbf-da97fb3bc6de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Src\Hid">
+      <UniqueIdentifier>{26256616-C7D3-4640-BE81-AF1B8EA9FE5B}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Src\Helper">
+      <UniqueIdentifier>{507A365B-6937-4B01-B453-DA908BF4BBD5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Esp32NMCI.ino" />
@@ -41,6 +47,12 @@
     </ClCompile>
     <ClCompile Include="src\Presentation\DisplayManager.cpp">
       <Filter>Src\Presentation</Filter>
+    </ClCompile>
+    <ClCompile Include="src\HidKeyboard.cpp">
+      <Filter>Src\Hid</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Helper\Utf8Decoder.cpp">
+      <Filter>Src\Helper</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -70,6 +82,15 @@
     </ClInclude>
     <ClInclude Include="src\Presentation\DisplayManager.h">
       <Filter>Src\Presentation</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HidConsts.h">
+      <Filter>Src\Hid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\HidKeyboard.h">
+      <Filter>Src\Hid</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Helper\Utf8Decoder.h">
+      <Filter>Src\Helper</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
