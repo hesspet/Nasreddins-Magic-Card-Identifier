@@ -43,6 +43,7 @@
     <Import Project="Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems" Label="Shared" />
     <Import Project="Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems" Label="Shared" />
     <Import Project="Libraries\FS\2.0.0\FS\FS-2.0.0.vcxitems" Label="Shared" />
+    <Import Project="Libraries\NimBLE-Arduino\2.3.6\NimBLE-Arduino\NimBLE-Arduino-2.3.6.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
@@ -89,6 +90,8 @@
     <ClCompile Include="src\Logger\Logger.cpp" />
     <ClCompile Include="src\Presentation\ButtonManager.cpp" />
     <ClCompile Include="src\Presentation\DisplayManager.cpp" />
+    <ClCompile Include="src\HidKeyboard.cpp" />
+    <ClCompile Include="src\Helper\Utf8Decoder.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\CardReader\CardReaderManager.h" />
@@ -99,6 +102,9 @@
     <ClInclude Include="src\Logger\Logger.h" />
     <ClInclude Include="src\Presentation\ButtonManager.h" />
     <ClInclude Include="src\Presentation\DisplayManager.h" />
+    <ClInclude Include="src\HidConsts.h" />
+    <ClInclude Include="src\HidKeyboard.h" />
+    <ClInclude Include="src\Helper\Utf8Decoder.h" />
     <ClInclude Include="__vm\.Esp32NMCI.vsarduino.h" />
   </ItemGroup>
   <PropertyGroup>

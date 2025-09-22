@@ -32,6 +32,8 @@
 #include "src/Logger/Logger.h"
 #include "src/Presentation/DisplayManager.h"
 #include "src/Presentation/ButtonManager.h"
+#include "src/HidKeyboard.h"
+#include "src/Helper/Utf8Decoder.h"
 
 
 /* Card Reader */
@@ -48,6 +50,7 @@ static DisplayManager displayManager;
 constexpr int kButtonPin0 = 0;
 constexpr int kButtonPin35 = 35;
 static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
+static HidKeyboard gKeyboard;
 
 static void OnNewData(const String& payloadText)
 {
@@ -94,10 +97,43 @@ void setup()
         cardReaderManager.begin();
         buttonManager.begin();
         buttonManager.setOnButton35LongPressed(EnterDeepSleep);
+
+        Serial.println();
+        Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) – Boot-Protocol-First"));
+        gKeyboard.begin();
 }
 
 void loop()
 {
+        while (Serial.available())
+        {
+                const uint8_t b = static_cast<uint8_t>(Serial.read());
+
+                uint32_t cp;
+                if (gUtf.feed(b, cp))
+                {
+                        if (cp == '\r')
+                        {
+                                continue;
+                        }
+
+                        if (!gKeyboard.isConnected())
+                        {
+                                if (cp <= 0x7F)
+                                {
+                                        Serial.printf("[WARN] Nicht verbunden: '%c' (0x%02X)\n", static_cast<char>(cp), static_cast<unsigned>(cp));
+                                }
+                                else
+                                {
+                                        Serial.printf("[WARN] Nicht verbunden: U+%04lX\n", static_cast<unsigned long>(cp));
+                                }
+                                continue;
+                        }
+
+                        gKeyboard.typeCodepoint(cp);
+                }
+        }
+
         buttonManager.update();
         cardReaderManager.process();
         displayManager.update();
