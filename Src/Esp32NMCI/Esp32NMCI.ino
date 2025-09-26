@@ -43,7 +43,7 @@
 #include "src/Presentation/DisplayManager.h"
 #include "src/Presentation/ButtonManager.h"
 #include "src/Helper/Utf8Decoder.h"
-
+#include "src/Ble/LoggingBleKeyboard.h"
 
 // Card Reader
 
@@ -103,46 +103,6 @@ constexpr int kButtonPin35 = 35;
  * @brief Verwaltung der physischen Taster inklusive Entprellung.
  */
 static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
-
-// Ble Keyboard Emulation
-
-/**
- * @brief Spezialisierte Tastaturemulation mit zusätzlichen Logmeldungen.
- */
-class LoggingBleKeyboard final : public BleKeyboard
-{
-public:
-        using BleKeyboard::BleKeyboard;
-
-protected:
-#if defined(USE_NIMBLE)
-        void onConnect(BLEServer* server, NimBLEConnInfo& connInfo) override
-        {
-                BleKeyboard::onConnect(server, connInfo);
-                Logger::LogInfo(F("[BLE] Verbindung hergestellt."));
-        }
-
-        void onDisconnect(BLEServer* server, NimBLEConnInfo& connInfo, int reason) override
-        {
-                BleKeyboard::onDisconnect(server, connInfo, reason);
-                Logger::logf(Logger::Level::Info,
-                             "[BLE] Verbindung getrennt (Grund: %d).\n",
-                             reason);
-        }
-#else
-        void onConnect(BLEServer* server) override
-        {
-                BleKeyboard::onConnect(server);
-                Logger::LogInfo(F("[BLE] Verbindung hergestellt."));
-        }
-
-        void onDisconnect(BLEServer* server) override
-        {
-                BleKeyboard::onDisconnect(server);
-                Logger::LogInfo(F("[BLE] Verbindung getrennt."));
-        }
-#endif
-};
 
 /**
  * @brief Globale Instanz der BLE-Tastaturemulation.

@@ -85,6 +85,7 @@
       <FileType>CppCode</FileType>
       <DeploymentContent>true</DeploymentContent>
     </ClCompile>
+    <ClCompile Include="src\Ble\LoggingBleKeyboard.cpp" />
     <ClCompile Include="src\CardReader\CardReaderManager.cpp" />
     <ClCompile Include="src\CardReader\CardPayloadProcessor.cpp" />
     <ClCompile Include="src\CardReader\NdefHelper.cpp" />
@@ -95,6 +96,7 @@
     <ClCompile Include="src\Helper\Utf8Decoder.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Ble\LoggingBleKeyboard.h" />
     <ClInclude Include="src\CardReader\CardReaderManager.h" />
     <ClInclude Include="src\CardReader\CardPayloadProcessor.h" />
     <ClInclude Include="src\CardReader\NdefHelper.h" />
