@@ -14,12 +14,26 @@ class BleKeyboardCallback final : public BleKeyboard
 public:
     using BleKeyboard::BleKeyboard;
 
+    void setDisplayManager(DisplayManager* manager)
+    {
+        displayManager = manager;
+
+        if (displayManager != nullptr)
+        {
+            displayManager->setBleConnectionState(isConnected());
+        }
+    }
+
 protected:
 #if defined(USE_NIMBLE)
     void onConnect(BLEServer* server, NimBLEConnInfo& connInfo) override
     {
         BleKeyboard::onConnect(server, connInfo);
         Logger::LogInfo(F("[BLE] Verbindung hergestellt."));
+        if (displayManager != nullptr)
+        {
+            displayManager->setBleConnectionState(true);
+        }
     }
 
     void onDisconnect(BLEServer* server, NimBLEConnInfo& connInfo, int reason) override
@@ -28,6 +42,10 @@ protected:
         Logger::logf(Logger::Level::Info,
             "[BLE] Verbindung getrennt (Grund: %d).\n",
             reason);
+        if (displayManager != nullptr)
+        {
+            displayManager->setBleConnectionState(false);
+        }
         restartAdvertisingIfNecessary();
     }
 #else
@@ -35,16 +53,25 @@ protected:
     {
         BleKeyboard::onConnect(server);
         Logger::LogInfo(F("[BLE] Verbindung hergestellt."));
+        if (displayManager != nullptr)
+        {
+            displayManager->setBleConnectionState(true);
+        }
     }
 
     void onDisconnect(BLEServer* server) override
     {
         BleKeyboard::onDisconnect(server);
         Logger::LogInfo(F("[BLE] Verbindung getrennt."));
+        if (displayManager != nullptr)
+        {
+            displayManager->setBleConnectionState(false);
+        }
         restartAdvertisingIfNecessary();
     }
 #endif
 
 private:
     void restartAdvertisingIfNecessary();
+    DisplayManager* displayManager = nullptr;
 };

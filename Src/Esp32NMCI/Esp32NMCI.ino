@@ -183,6 +183,7 @@ void setup()
 
 	displayManager.begin(DisplayManager::Orientation::UsbLeft);
 	Logger::setDisplayManager(&displayManager);
+	gbleKeyboard.setDisplayManager(&displayManager);
 
 	cardReaderManager.setNewDataCallback(OnNewData);
 	cardReaderManager.begin();
