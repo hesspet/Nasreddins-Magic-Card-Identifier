@@ -17,15 +17,23 @@
 */
 /**************************************************************************/
 
-#include <NimBLEDevice.h>
-#include <BleKeyboard.h>
+// Ble Handling - Keyboard Emulation
+#include <NimBLEDevice.h> // 2.3.6
+#include <BleKeyboard.h> // Hinweis: Manuell gepatched für NimBLE 2.3.6!
+
+// Für T-Disüplay notwendig
 #include <SPI.h>
 #include <TFT_eSPI.h>
+
+// Card Reader
 #include <PN532.h>
 #include <PN532_HSU.h>
+
+// Stuff :-)
 #include <vector>
 #include <esp_sleep.h>
 
+// Implementation
 #include "src/config.h"
 #include "src/CardReader/CardReaderManager.h"
 #include "src/CardReader/CardPayloadProcessor.h"
@@ -37,7 +45,7 @@
 #include "src/Helper/Utf8Decoder.h"
 
 
-/* Card Reader */
+// Card Reader 
 
 static PN532_HSU pn532hsu(PN532_HSU_PORT);
 static PN532 nfc(pn532hsu);
@@ -47,10 +55,16 @@ static NdefHelper ndefHelper;
 static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
 static CardPayloadProcessor cardPayloadProcessor;
 static std::vector<String> ListElementsInPayloadFromCard;
+
+// Display
+
 static DisplayManager displayManager;
 constexpr int kButtonPin0 = 0;
 constexpr int kButtonPin35 = 35;
 static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
+
+// Ble Keyboard Emulation
+
 BleKeyboard gbleKeyboard;
 
 static void SendTextToKeyboard(const String& text)

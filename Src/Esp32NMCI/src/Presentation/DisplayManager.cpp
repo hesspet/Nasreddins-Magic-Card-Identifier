@@ -31,7 +31,7 @@ void DisplayManager::begin(Orientation orientation)
 	digitalWrite(TFT_BL, TFT_BACKLIGHT_ON);
 #endif
 
-	showMessage("NMCI V1", false);
+	showMessage(VERSION_TEXT, false);
 }
 
 void DisplayManager::renderSingleMessage(const String& message, uint16_t textColor)
