@@ -523,9 +523,11 @@ void BleKeyboard::onDisconnect(BLEServer* pServer) {
   desc = (BLE2902*)this->inputMediaKeys->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
   desc->setNotifications(false);
 
-  advertising->start();
-
 #endif // !USE_NIMBLE
+
+  if (advertising) {
+    advertising->start();
+  }
 }
 
 void BleKeyboard::onWrite(BLECharacteristic* me) {

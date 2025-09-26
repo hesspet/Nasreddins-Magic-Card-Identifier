@@ -542,14 +542,16 @@ void BleKeyboard::onDisconnect(BLEServer * pServer) {
 
 #if !defined(USE_NIMBLE)
 
-	BLE2902* desc = (BLE2902*)this->inputKeyboard->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
-	desc->setNotifications(false);
-	desc = (BLE2902*)this->inputMediaKeys->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
-	desc->setNotifications(false);
-
-	advertising->start();
+        BLE2902* desc = (BLE2902*)this->inputKeyboard->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
+        desc->setNotifications(false);
+        desc = (BLE2902*)this->inputMediaKeys->getDescriptorByUUID(BLEUUID((uint16_t)0x2902));
+        desc->setNotifications(false);
 
 #endif // !USE_NIMBLE
+
+        if (advertising) {
+                advertising->start();
+        }
 }
 
 
