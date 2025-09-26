@@ -45,28 +45,99 @@
 #include "src/Helper/Utf8Decoder.h"
 
 
-// Card Reader 
+// Card Reader
 
+/**
+ * @brief High-Speed-UART-Schnittstelle zum PN532-Modul.
+ */
 static PN532_HSU pn532hsu(PN532_HSU_PORT);
+
+/**
+ * @brief PN532-Instanz zur Kommunikation mit dem NFC-Leser.
+ */
 static PN532 nfc(pn532hsu);
+
+/**
+ * @brief Reader für MIFARE-Type-2-Tags basierend auf dem PN532.
+ */
 static Type2TagReader tagReader(nfc);
 
+/**
+ * @brief Hilfsklasse zum Interpretieren von NDEF-Daten.
+ */
 static NdefHelper ndefHelper;
+
+/**
+ * @brief Steuerung der Kartenleser-Logik inklusive Callback-Registrierung.
+ */
 static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
+
+/**
+ * @brief Verarbeitet Kartendaten zu anzeigbaren bzw. übertragbaren Listen.
+ */
 static CardPayloadProcessor cardPayloadProcessor;
+
+/**
+ * @brief Zwischenspeicher für die aus einer Karte extrahierten Nutzdaten.
+ */
 static std::vector<String> ListElementsInPayloadFromCard;
 
 // Display
 
+/**
+ * @brief Manager für die Ausgabe auf dem integrierten T-Display.
+ */
 static DisplayManager displayManager;
+
+/**
+ * @brief GPIO des ersten Tasters (Boot-Button).
+ */
 constexpr int kButtonPin0 = 0;
+
+/**
+ * @brief GPIO des zweiten Tasters, dient gleichzeitig als Wake-Up-Quelle.
+ */
 constexpr int kButtonPin35 = 35;
+
+/**
+ * @brief Verwaltung der physischen Taster inklusive Entprellung.
+ */
 static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
 
 // Ble Keyboard Emulation
 
-BleKeyboard gbleKeyboard;
+/**
+ * @brief Spezialisierte Tastaturemulation mit zusätzlichen Logmeldungen.
+ */
+class LoggingBleKeyboard final : public BleKeyboard
+{
+public:
+        using BleKeyboard::BleKeyboard;
 
+protected:
+        void onConnect(BLEServer* server) override
+        {
+                BleKeyboard::onConnect(server);
+                Logger::LogInfo(F("[BLE] Verbindung hergestellt."));
+        }
+
+        void onDisconnect(BLEServer* server) override
+        {
+                BleKeyboard::onDisconnect(server);
+                Logger::LogInfo(F("[BLE] Verbindung getrennt."));
+        }
+};
+
+/**
+ * @brief Globale Instanz der BLE-Tastaturemulation.
+ */
+static LoggingBleKeyboard gbleKeyboard;
+
+/**
+ * @brief Sendet einen Text über die BLE-Tastatur, sofern eine Verbindung besteht.
+ *
+ * @param text UTF-8-kodierter Inhalt, der übertragen werden soll.
+ */
 static void SendTextToKeyboard(const String& text)
 {
 	if (text.length() == 0)
@@ -83,6 +154,11 @@ static void SendTextToKeyboard(const String& text)
 	gbleKeyboard.print(text);
 }
 
+/**
+ * @brief Callback bei neuen Kartendaten zur Anzeige und Weitergabe per BLE.
+ *
+ * @param payloadText Rohtext der ausgelesenen Karte.
+ */
 static void OnNewData(const String& payloadText)
 {
 	ListElementsInPayloadFromCard = cardPayloadProcessor.ProcessPayload(payloadText);
@@ -112,6 +188,9 @@ static void OnNewData(const String& payloadText)
 
 }
 
+/**
+ * @brief Versetzt den ESP32 in den Tiefschlaf und aktiviert Wake-Up über GPIO 35.
+ */
 static void EnterDeepSleep()
 {
 	Logger::LogInfo(F("[System] Entering deep sleep"));
@@ -119,6 +198,9 @@ static void EnterDeepSleep()
 	esp_deep_sleep_start();
 }
 
+/**
+ * @brief Arduino-Initialisierung: richtet Logger, Anzeige, Kartenleser und BLE ein.
+ */
 void setup()
 {
 	Logger::begin(115200, true, Logger::Level::Info);
@@ -136,6 +218,9 @@ void setup()
 	gbleKeyboard.begin();
 }
 
+/**
+ * @brief Hauptschleife zum Auswerten der seriellen Schnittstelle und Eingaben.
+ */
 void loop()
 {
 	while (Serial.available())
