@@ -52,19 +52,51 @@ constexpr int kButtonPin35 = 35;
 static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
 static HidKeyboard gKeyboard;
 
+static void SendTextToKeyboard(const String& text)
+{
+        if (text.length() == 0)
+        {
+                return;
+        }
+
+        if (!gKeyboard.isConnected())
+        {
+                Logger::LogWarn(F("BLE keyboard not connected; skipping payload transfer."));
+                return;
+        }
+
+        Utf8Decoder decoder;
+        uint32_t codepoint;
+
+        for (size_t index = 0; index < static_cast<size_t>(text.length()); ++index)
+        {
+                const uint8_t byte = static_cast<uint8_t>(text.charAt(index));
+
+                if (decoder.feed(byte, codepoint))
+                {
+                        if (codepoint == '\r' || codepoint == '\n')
+                        {
+                                continue;
+                        }
+
+                        gKeyboard.typeCodepoint(codepoint);
+                }
+        }
+}
+
 static void OnNewData(const String& payloadText)
 {
         ListElementsInPayloadFromCard = cardPayloadProcessor.ProcessPayload(payloadText);
 
-	if (ListElementsInPayloadFromCard.empty())
-	{
+        if (ListElementsInPayloadFromCard.empty())
+        {
 		Logger::LogWarn(F("Received empty card payload."));
 		return;
-	}
+        }
 
-	Logger::LogInfo(F("Processed card payload values:"));
+        Logger::LogInfo(F("Processed card payload values:"));
 
-	for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
+        for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
 	{
 		if (index == 0)
 		{
@@ -73,9 +105,11 @@ static void OnNewData(const String& payloadText)
 
 		}
 		Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
-	}
+        }
 
-	displayManager.showMessage(ListElementsInPayloadFromCard);
+        displayManager.showMessage(ListElementsInPayloadFromCard);
+
+        SendTextToKeyboard(ListElementsInPayloadFromCard.front());
 
 }
 
