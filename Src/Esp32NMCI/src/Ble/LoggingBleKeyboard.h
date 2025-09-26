@@ -1,13 +1,13 @@
 #pragma once
 
 #include <NimBLEDevice.h> // 2.3.6
-#include <BleKeyboard.h> // Hinweis: Manuell gepatched für NimBLE 2.3.6!
+#include <BleKeyboard.h> // Hinweis: Manuell gepatched fÃ¼r NimBLE 2.3.6!
 #include "../Presentation/DisplayManager.h"
 #include "../Logger/Logger.h"
 
 
 /**
- * @brief Spezialisierte Tastaturemulation mit zusätzlichen Logmeldungen.
+ * @brief Spezialisierte Tastaturemulation mit zusÃ¤tzlichen Logmeldungen.
  */
 class LoggingBleKeyboard final : public BleKeyboard
 {
@@ -28,6 +28,7 @@ protected:
         Logger::logf(Logger::Level::Info,
             "[BLE] Verbindung getrennt (Grund: %d).\n",
             reason);
+        restartAdvertisingIfNecessary();
     }
 #else
     void onConnect(BLEServer* server) override
@@ -40,6 +41,10 @@ protected:
     {
         BleKeyboard::onDisconnect(server);
         Logger::LogInfo(F("[BLE] Verbindung getrennt."));
+        restartAdvertisingIfNecessary();
     }
 #endif
+
+private:
+    void restartAdvertisingIfNecessary();
 };
