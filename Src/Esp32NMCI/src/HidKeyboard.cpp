@@ -225,40 +225,18 @@ void HidKeyboard::afterConnect() {
     }
 
     auto sendRelease = [this]() {
-        uint8_t rpt[8] = { 0,0,0,0,0,0,0,0 };
-        if (mBootIn) {
-            mBootIn->setValue(rpt, sizeof(rpt));
-            mBootIn->notify();
-        }
-        if (mInputReport) {
-            mInputReport->setValue(rpt, sizeof(rpt));
-            mInputReport->notify();
-        }
+        sendKeyReportRaw(mBootIn, "Boot", 0);
+        sendKeyReportRaw(mInputReport, "Report", 0);
     };
 
-    uint8_t rptA[8] = { KEYBOARD_MODIFIER_LEFTSHIFT, 0, HID_KEY_A, 0,0,0,0,0 };
-    uint8_t rptEnter[8] = { 0,0, HID_KEY_ENTER, 0,0,0,0,0 };
-
-    if (mBootIn) {
-        mBootIn->setValue(rptA, sizeof(rptA));
-        mBootIn->notify();
-    }
-    if (mInputReport) {
-        mInputReport->setValue(rptA, sizeof(rptA));
-        mInputReport->notify();
-    }
+    sendKeyReportRaw(mBootIn, "Boot", KEYBOARD_MODIFIER_LEFTSHIFT, HID_KEY_A);
+    sendKeyReportRaw(mInputReport, "Report", KEYBOARD_MODIFIER_LEFTSHIFT, HID_KEY_A);
     delay(10);
     sendRelease();
     delay(10);
 
-    if (mBootIn) {
-        mBootIn->setValue(rptEnter, sizeof(rptEnter));
-        mBootIn->notify();
-    }
-    if (mInputReport) {
-        mInputReport->setValue(rptEnter, sizeof(rptEnter));
-        mInputReport->notify();
-    }
+    sendKeyReportRaw(mBootIn, "Boot", 0, HID_KEY_ENTER);
+    sendKeyReportRaw(mInputReport, "Report", 0, HID_KEY_ENTER);
     delay(10);
     sendRelease();
 
@@ -286,8 +264,31 @@ void HidKeyboard::sendKeyReportRaw(
     if (!characteristic) {
         return;
     }
-    uint8_t rpt[8] = { mods, 0x00, k1, k2, k3, k4, k5, k6 };
-    characteristic->setValue(rpt, sizeof(rpt));
+    uint8_t rpt[9] = { 0 };
+    size_t len = 0;
+    if (characteristic == mInputReport) {
+        rpt[0] = 0x01; // Report ID as defined in KEYBOARD_REPORTMAP
+        rpt[1] = mods;
+        rpt[2] = 0x00;
+        rpt[3] = k1;
+        rpt[4] = k2;
+        rpt[5] = k3;
+        rpt[6] = k4;
+        rpt[7] = k5;
+        rpt[8] = k6;
+        len = 9;
+    } else {
+        rpt[0] = mods;
+        rpt[1] = 0x00;
+        rpt[2] = k1;
+        rpt[3] = k2;
+        rpt[4] = k3;
+        rpt[5] = k4;
+        rpt[6] = k5;
+        rpt[7] = k6;
+        len = 8;
+    }
+    characteristic->setValue(rpt, len);
     bool ok = characteristic->notify();
     Serial.printf("[HID] send %s notify=%d mods=%02X keys=%02X %02X %02X %02X %02X %02X\n",
         tag,
