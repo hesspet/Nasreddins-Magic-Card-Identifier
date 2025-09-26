@@ -48,9 +48,6 @@
     <ClCompile Include="src\Presentation\DisplayManager.cpp">
       <Filter>Src\Presentation</Filter>
     </ClCompile>
-    <ClCompile Include="src\HidKeyboard.cpp">
-      <Filter>Src\Hid</Filter>
-    </ClCompile>
     <ClCompile Include="src\Helper\Utf8Decoder.cpp">
       <Filter>Src\Helper</Filter>
     </ClCompile>
@@ -82,12 +79,6 @@
     </ClInclude>
     <ClInclude Include="src\Presentation\DisplayManager.h">
       <Filter>Src\Presentation</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HidConsts.h">
-      <Filter>Src\Hid</Filter>
-    </ClInclude>
-    <ClInclude Include="src\HidKeyboard.h">
-      <Filter>Src\Hid</Filter>
     </ClInclude>
     <ClInclude Include="src\Helper\Utf8Decoder.h">
       <Filter>Src\Helper</Filter>

@@ -17,6 +17,8 @@
 */
 /**************************************************************************/
 
+#include <NimBLEDevice.h>
+#include <BleKeyboard.h>
 #include <SPI.h>
 #include <TFT_eSPI.h>
 #include <PN532.h>
@@ -32,7 +34,6 @@
 #include "src/Logger/Logger.h"
 #include "src/Presentation/DisplayManager.h"
 #include "src/Presentation/ButtonManager.h"
-#include "src/HidKeyboard.h"
 #include "src/Helper/Utf8Decoder.h"
 
 
@@ -50,53 +51,37 @@ static DisplayManager displayManager;
 constexpr int kButtonPin0 = 0;
 constexpr int kButtonPin35 = 35;
 static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
-static HidKeyboard gKeyboard;
+BleKeyboard gbleKeyboard;
 
 static void SendTextToKeyboard(const String& text)
 {
-        if (text.length() == 0)
-        {
-                return;
-        }
+	if (text.length() == 0)
+	{
+		return;
+	}
 
-        if (!gKeyboard.isConnected())
-        {
-                Logger::LogWarn(F("BLE keyboard not connected; skipping payload transfer."));
-                return;
-        }
+	if (!gbleKeyboard.isConnected())
+	{
+		Logger::LogWarn(F("BLE keyboard not connected; skipping payload transfer."));
+		return;
+	}
 
-        Utf8Decoder decoder;
-        uint32_t codepoint;
-
-        for (size_t index = 0; index < static_cast<size_t>(text.length()); ++index)
-        {
-                const uint8_t byte = static_cast<uint8_t>(text.charAt(index));
-
-                if (decoder.feed(byte, codepoint))
-                {
-                        if (codepoint == '\r' || codepoint == '\n')
-                        {
-                                continue;
-                        }
-
-                        gKeyboard.typeCodepoint(codepoint);
-                }
-        }
+	gbleKeyboard.print(text);
 }
 
 static void OnNewData(const String& payloadText)
 {
-        ListElementsInPayloadFromCard = cardPayloadProcessor.ProcessPayload(payloadText);
+	ListElementsInPayloadFromCard = cardPayloadProcessor.ProcessPayload(payloadText);
 
-        if (ListElementsInPayloadFromCard.empty())
-        {
+	if (ListElementsInPayloadFromCard.empty())
+	{
 		Logger::LogWarn(F("Received empty card payload."));
 		return;
-        }
+	}
 
-        Logger::LogInfo(F("Processed card payload values:"));
+	Logger::LogInfo(F("Processed card payload values:"));
 
-        for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
+	for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
 	{
 		if (index == 0)
 		{
@@ -105,71 +90,61 @@ static void OnNewData(const String& payloadText)
 
 		}
 		Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
-        }
+	}
 
-        displayManager.showMessage(ListElementsInPayloadFromCard);
+	displayManager.showMessage(ListElementsInPayloadFromCard);
 
-        SendTextToKeyboard(ListElementsInPayloadFromCard.front());
+	SendTextToKeyboard(ListElementsInPayloadFromCard.front());
 
 }
 
 static void EnterDeepSleep()
 {
-        Logger::LogInfo(F("[System] Entering deep sleep"));
-        esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 0);
-        esp_deep_sleep_start();
+	Logger::LogInfo(F("[System] Entering deep sleep"));
+	esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 0);
+	esp_deep_sleep_start();
 }
 
 void setup()
 {
-        Logger::begin(115200, true, Logger::Level::Info);
+	Logger::begin(115200, true, Logger::Level::Info);
 
-        displayManager.begin(DisplayManager::Orientation::UsbLeft);
-        Logger::setDisplayManager(&displayManager);
+	displayManager.begin(DisplayManager::Orientation::UsbLeft);
+	Logger::setDisplayManager(&displayManager);
 
-        cardReaderManager.setNewDataCallback(OnNewData);
-        cardReaderManager.begin();
-        buttonManager.begin();
-        buttonManager.setOnButton35LongPressed(EnterDeepSleep);
+	cardReaderManager.setNewDataCallback(OnNewData);
+	cardReaderManager.begin();
+	buttonManager.begin();
+	buttonManager.setOnButton35LongPressed(EnterDeepSleep);
 
-        Serial.println();
-        Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) – Boot-Protocol-First"));
-        gKeyboard.begin();
+	Serial.println();
+	Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) – Boot-Protocol-First"));
+	gbleKeyboard.begin();
 }
 
 void loop()
 {
-        while (Serial.available())
-        {
-                const uint8_t b = static_cast<uint8_t>(Serial.read());
+	while (Serial.available())
+	{
+		const uint8_t b = static_cast<uint8_t>(Serial.read());
 
-                uint32_t cp;
-                if (gUtf.feed(b, cp))
-                {
-                        if (cp == '\r')
-                        {
-                                continue;
-                        }
+		if (!gbleKeyboard.isConnected())
+		{
+			if (b <= 0x7F)
+			{
+				Serial.printf("[WARN] Nicht verbunden: '%c' (0x%02X)\n", static_cast<char>(b), static_cast<unsigned>(b));
+			}
+			else
+			{
+				Serial.printf("[WARN] Nicht verbunden: U+%04lX\n", static_cast<unsigned long>(b));
+			}
+			continue;
+		}
+		gbleKeyboard.print(b);
+	}
 
-                        if (!gKeyboard.isConnected())
-                        {
-                                if (cp <= 0x7F)
-                                {
-                                        Serial.printf("[WARN] Nicht verbunden: '%c' (0x%02X)\n", static_cast<char>(cp), static_cast<unsigned>(cp));
-                                }
-                                else
-                                {
-                                        Serial.printf("[WARN] Nicht verbunden: U+%04lX\n", static_cast<unsigned long>(cp));
-                                }
-                                continue;
-                        }
-
-                        gKeyboard.typeCodepoint(cp);
-                }
-        }
-
-        buttonManager.update();
-        cardReaderManager.process();
-        displayManager.update();
+	buttonManager.update();
+	cardReaderManager.process();
+	displayManager.update();
 }
 

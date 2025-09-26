@@ -9,6 +9,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TFT_eSPI-2.5.43", "Src\Esp3
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI-3.3.0", "Src\Esp32NMCI\Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems", "{550F5415-0A65-4984-92B5-AF9935240DA6}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ESP32-BLE-Keyboard-0.3.2", "Src\Esp32NMCI\Libraries\ESP32-BLE-Keyboard\0.3.2\ESP32-BLE-Keyboard\ESP32-BLE-Keyboard-0.3.2.vcxitems", "{2700B904-554D-4D88-AE17-4DEC4C806EA6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "NimBLE-Arduino-2.3.6", "Src\Esp32NMCI\Libraries\NimBLE-Arduino\2.3.6\NimBLE-Arduino\NimBLE-Arduino-2.3.6.vcxitems", "{3B7A020F-372B-44D3-BD03-8208374964F8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM = Debug|ARM
@@ -37,10 +41,13 @@ Global
 		SolutionGuid = {B29A9AD4-C0B9-41E4-B186-4A30B9DCB43D}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Src\Esp32NMCI\Libraries\ESP32-BLE-Keyboard\0.3.2\ESP32-BLE-Keyboard\ESP32-BLE-Keyboard-0.3.2.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
 		Src\Esp32NMCI\Libraries\FS\2.0.0\FS\FS-2.0.0.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
 		Src\Esp32NMCI\Libraries\NimBLE-Arduino\2.3.6\NimBLE-Arduino\NimBLE-Arduino-2.3.6.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
 		Src\Esp32NMCI\Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
 		Src\Esp32NMCI\Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
+		Src\Esp32NMCI\Libraries\ESP32-BLE-Keyboard\0.3.2\ESP32-BLE-Keyboard\ESP32-BLE-Keyboard-0.3.2.vcxitems*{2700b904-554d-4d88-ae17-4dec4c806ea6}*SharedItemsImports = 9
+		Src\Esp32NMCI\Libraries\NimBLE-Arduino\2.3.6\NimBLE-Arduino\NimBLE-Arduino-2.3.6.vcxitems*{3b7a020f-372b-44d3-bd03-8208374964f8}*SharedItemsImports = 9
 		Src\Esp32NMCI\Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems*{550f5415-0a65-4984-92b5-af9935240da6}*SharedItemsImports = 9
 		Src\Esp32NMCI\Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems*{72c16f56-74dd-49a9-871b-756b910da1e0}*SharedItemsImports = 9
 	EndGlobalSection
