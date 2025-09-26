@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.14.36310.24
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Esp32NMCI", "Esp32NMCI.vcxproj", "{058DBB46-AD69-4215-6260-991D36DCFCFB}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Esp32NMCI", "Src\Esp32NMCI\Esp32NMCI.vcxproj", "{058DBB46-AD69-4215-6260-991D36DCFCFB}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TFT_eSPI-2.5.43", "Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems", "{72C16F56-74DD-49A9-871B-756B910DA1E0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "TFT_eSPI-2.5.43", "Src\Esp32NMCI\Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems", "{72C16F56-74DD-49A9-871B-756B910DA1E0}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI-3.3.0", "Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems", "{550F5415-0A65-4984-92B5-AF9935240DA6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SPI-3.3.0", "Src\Esp32NMCI\Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems", "{550F5415-0A65-4984-92B5-AF9935240DA6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -37,10 +37,11 @@ Global
 		SolutionGuid = {B29A9AD4-C0B9-41E4-B186-4A30B9DCB43D}
 	EndGlobalSection
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Libraries\FS\2.0.0\FS\FS-2.0.0.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
-		Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
-		Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
-		Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems*{550f5415-0a65-4984-92b5-af9935240da6}*SharedItemsImports = 9
-		Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems*{72c16f56-74dd-49a9-871b-756b910da1e0}*SharedItemsImports = 9
+		Src\Esp32NMCI\Libraries\FS\2.0.0\FS\FS-2.0.0.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
+		Src\Esp32NMCI\Libraries\NimBLE-Arduino\2.3.6\NimBLE-Arduino\NimBLE-Arduino-2.3.6.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
+		Src\Esp32NMCI\Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
+		Src\Esp32NMCI\Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems*{058dbb46-ad69-4215-6260-991d36dcfcfb}*SharedItemsImports = 4
+		Src\Esp32NMCI\Libraries\SPI\3.3.0\SPI\SPI-3.3.0.vcxitems*{550f5415-0a65-4984-92b5-af9935240da6}*SharedItemsImports = 9
+		Src\Esp32NMCI\Libraries\TFT_eSPI\2.5.43\TFT_eSPI\TFT_eSPI-2.5.43.vcxitems*{72c16f56-74dd-49a9-871b-756b910da1e0}*SharedItemsImports = 9
 	EndGlobalSection
 EndGlobal
