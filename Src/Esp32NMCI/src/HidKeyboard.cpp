@@ -86,6 +86,9 @@ private:
     HidKeyboard& mKeyboard;
 };
 
+///
+/// Konstruktor: initialisiert sämtliche Statuszeiger und Callback-Wrapper.
+///
 HidKeyboard::HidKeyboard()
     : mInputReport(nullptr)
     , mBootIn(nullptr)
@@ -101,6 +104,15 @@ HidKeyboard::HidKeyboard()
 
 HidKeyboard::~HidKeyboard() = default;
 
+/**
+ * Initialisiert den NimBLE-Stack, legt den HID-Service samt
+ * Charakteristiken an und startet anschließendes Advertising.
+ *
+ * Die Methode richtet ebenfalls einen Device-Information-Service ein und
+ * hinterlegt die Report-Map, in der der Report mit der ID 0x01 definiert ist.
+ * Dadurch weiß der Host, dass im Report-Modus ein führendes Report-ID-Byte
+ * zu erwarten ist.
+ */
 void HidKeyboard::begin() {
     NimBLEDevice::init("ESP32 DE Keyboard");
     NimBLEDevice::setSecurityIOCap(BLE_HS_IO_NO_INPUT_OUTPUT);
@@ -179,10 +191,20 @@ void HidKeyboard::begin() {
     Serial.println("[INFO] Im seriellen Monitor tippen; Enter = Zeilenumbruch. (UTF-8)");
 }
 
+/**
+ * Gibt an, ob aktuell eine BLE-Verbindung besteht.
+ */
 bool HidKeyboard::isConnected() const {
     return mConnected;
 }
 
+/**
+ * Übersetzt einen UTF-32-Codepoint ins deutsche Tastaturlayout und sendet
+ * anschließend einen Press/Release-Zyklus.
+ *
+ * Nicht abbildbare Zeichen erzeugen lediglich eine Debug-Ausgabe, so dass der
+ * Aufrufer über fehlende Zuordnungen informiert ist.
+ */
 void HidKeyboard::typeCodepoint(uint32_t cp) {
     uint8_t mods;
     uint8_t key;
@@ -197,6 +219,13 @@ void HidKeyboard::typeCodepoint(uint32_t cp) {
     pressAndRelease(mods, key);
 }
 
+/**
+ * Callback-Handler für Schreibzugriffe auf die Protocol-Mode-Charakteristik.
+ *
+ * Der Host schreibt hier 0x00 (Boot) oder 0x01 (Report). Der Wert wird
+ * validiert und anschließend gespeichert, damit zukünftige Reports in das
+ * korrekte Format gebracht werden.
+ */
 void HidKeyboard::handleProtocolModeWrite(NimBLECharacteristic* characteristic) {
     std::string value = characteristic->getValue();
     if (value.size() == 1 && (value[0] == 0x00 || value[0] == 0x01)) {
@@ -205,6 +234,14 @@ void HidKeyboard::handleProtocolModeWrite(NimBLECharacteristic* characteristic) 
     }
 }
 
+/**
+ * Aktualisiert die Merker, ob Boot- bzw. Report-Input-Charakteristiken
+ * Benachrichtigungen senden dürfen.
+ *
+ * Der CCCD-Wert (subValue) wird daraufhin untersucht, ob das Notify-Bit
+ * gesetzt ist. Nur wenn dies der Fall ist, werden spätere Reports auf dem
+ * entsprechenden Kanal verschickt.
+ */
 void HidKeyboard::handleSubscription(NimBLECharacteristic* characteristic, uint16_t subValue) {
     const bool notifyEnabled = (subValue & 0x0001);
     if (characteristic == mBootIn) {
@@ -216,6 +253,14 @@ void HidKeyboard::handleSubscription(NimBLECharacteristic* characteristic, uint1
     }
 }
 
+/**
+ * Wird unmittelbar nach erfolgreichem Verbindungsaufbau aufgerufen.
+ *
+ * Nach einem kurzen Delay wird eine Testsequenz bestehend aus "Shift+A" und
+ * Enter gesendet, damit sowohl Boot- als auch Report-Input eine initiale
+ * Aktivität verzeichnen. Das hilft insbesondere bei Hosts, die erst nach dem
+ * ersten Key-Event die Bildschirmanzeige aktivieren.
+ */
 void HidKeyboard::afterConnect() {
     mConnected = true;
     Serial.println("[BLE] Verbunden");
@@ -243,6 +288,10 @@ void HidKeyboard::afterConnect() {
     Serial.printf("[HID] ProtocolMode on connect (may change) = %s\n", mProtocolMode ? "Report(1)" : "Boot(0)");
 }
 
+/**
+ * Rücksetzen aller Statusmerker und Neustart des Advertisings nach
+ * Verbindungsabbruch.
+ */
 void HidKeyboard::afterDisconnect() {
     mConnected = false;
     mSubBootIn = false;
@@ -251,6 +300,18 @@ void HidKeyboard::afterDisconnect() {
     NimBLEDevice::startAdvertising();
 }
 
+/**
+ * Sendet einen Keyboard-Report an die angegebene Charakteristik.
+ *
+ * Für die Boot-Charakteristik besteht der Report aus 8 Bytes (Modifier,
+ * Reserved, sechs Keycodes). Für den Report-Mode wird automatisch die
+ * Report-ID 0x01 vorangestellt, womit der Report insgesamt 9 Bytes umfasst.
+ *
+ * @param characteristic Zielcharakteristik für den Report.
+ * @param tag Debug-Tag für die serielle Ausgabe.
+ * @param mods Modifier-Bits.
+ * @param k1..k6 Bis zu sechs gleichzeitig gedrückte Tasten.
+ */
 void HidKeyboard::sendKeyReportRaw(
     NimBLECharacteristic* characteristic,
     const char* tag,
@@ -302,6 +363,14 @@ void HidKeyboard::sendKeyReportRaw(
         k6);
 }
 
+/**
+ * Öffentliche Helfermethode, die abhängig vom Protokollmodus den passenden
+ * Kanal wählt.
+ *
+ * Ist der Host noch nicht verbunden oder hat keine Benachrichtigungen
+ * aktiviert, wird der Report vorsorglich an beide Charakteristiken gesendet,
+ * damit kein Tastenanschlag verloren geht.
+ */
 void HidKeyboard::sendKeyReport(
     uint8_t mods,
     uint8_t k1,
@@ -330,6 +399,10 @@ void HidKeyboard::sendKeyReport(
     sendKeyReportRaw(mInputReport, "Report*", mods, k1, k2, k3, k4, k5, k6);
 }
 
+/**
+ * Sendet erst einen Tastendruck und anschließend – nach kurzen Delays – den
+ * zugehörigen Release-Report.
+ */
 void HidKeyboard::pressAndRelease(uint8_t mods, uint8_t key) {
     sendKeyReport(mods, key);
     delay(8);
@@ -337,6 +410,12 @@ void HidKeyboard::pressAndRelease(uint8_t mods, uint8_t key) {
     delay(5);
 }
 
+/**
+ * Konvertiert einen Codepoint in das deutsche HID-Layout.
+ *
+ * Neben den Standard-ASCII-Zeichen werden auch Umlaute und Sonderzeichen
+ * behandelt. Modifier-Bits (Shift/AltGr) werden nach Bedarf gesetzt.
+ */
 bool HidKeyboard::cpToHid_DE(uint32_t cp, uint8_t& mods, uint8_t& key) {
     mods = 0;
     if (cp == '\n' || cp == '\r') { key = HID_KEY_ENTER; return true; }
