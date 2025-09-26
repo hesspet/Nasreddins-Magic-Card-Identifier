@@ -1,10 +1,10 @@
-#include "LoggingBleKeyboard.h"
+#include "BleKeyboardCallback.h"
 
 #if defined(USE_NIMBLE)
 #include <NimBLEAdvertising.h>
 #endif
 
-void LoggingBleKeyboard::restartAdvertisingIfNecessary()
+void BleKeyboardCallback::restartAdvertisingIfNecessary()
 {
 #if defined(USE_NIMBLE)
     NimBLEAdvertising* advertising = BLEDevice::getAdvertising();

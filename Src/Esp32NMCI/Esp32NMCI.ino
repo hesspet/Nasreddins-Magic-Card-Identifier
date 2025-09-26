@@ -43,7 +43,7 @@
 #include "src/Presentation/DisplayManager.h"
 #include "src/Presentation/ButtonManager.h"
 #include "src/Helper/Utf8Decoder.h"
-#include "src/Ble/LoggingBleKeyboard.h"
+#include "src/Ble/BleKeyboardCallback.h"
 
 // Card Reader
 
@@ -107,7 +107,7 @@ static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
 /**
  * @brief Globale Instanz der BLE-Tastaturemulation.
  */
-static LoggingBleKeyboard gbleKeyboard;
+static BleKeyboardCallback gbleKeyboard;
 
 /**
  * @brief Sendet einen Text über die BLE-Tastatur, sofern eine Verbindung besteht.

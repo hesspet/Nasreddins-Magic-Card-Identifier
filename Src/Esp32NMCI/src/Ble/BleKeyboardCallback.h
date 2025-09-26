@@ -9,7 +9,7 @@
 /**
  * @brief Spezialisierte Tastaturemulation mit zusätzlichen Logmeldungen.
  */
-class LoggingBleKeyboard final : public BleKeyboard
+class BleKeyboardCallback final : public BleKeyboard
 {
 public:
     using BleKeyboard::BleKeyboard;
