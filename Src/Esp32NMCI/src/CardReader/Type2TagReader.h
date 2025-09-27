@@ -1,3 +1,10 @@
+/***************************************************************************
+ * Project: Esp32NMCI
+ * File: Type2TagReader.h
+ * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
+ * Author: Peter Heß, Büdingen DE
+ ***************************************************************************/
+
 #pragma once
 
 #include <PN532.h>

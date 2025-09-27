@@ -1,3 +1,10 @@
+/***************************************************************************
+ * Project: Esp32NMCI
+ * File: Logger.cpp
+ * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
+ * Author: Peter Heß, Büdingen DE
+ ***************************************************************************/
+
 #include "Logger.h"
 
 #include <cstring>

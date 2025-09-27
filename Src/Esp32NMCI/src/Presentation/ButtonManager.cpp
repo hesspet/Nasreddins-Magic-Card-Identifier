@@ -1,3 +1,10 @@
+/***************************************************************************
+ * Project: Esp32NMCI
+ * File: ButtonManager.cpp
+ * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
+ * Author: Peter Heß, Büdingen DE
+ ***************************************************************************/
+
 // ButtonManager.cpp
 #include "ButtonManager.h"
 #include "../Logger/Logger.h"

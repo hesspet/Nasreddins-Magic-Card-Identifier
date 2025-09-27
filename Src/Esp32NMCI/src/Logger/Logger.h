@@ -1,3 +1,10 @@
+/***************************************************************************
+ * Project: Esp32NMCI
+ * File: Logger.h
+ * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
+ * Author: Peter Heß, Büdingen DE
+ ***************************************************************************/
+
 #pragma once
 
 #include <Arduino.h>

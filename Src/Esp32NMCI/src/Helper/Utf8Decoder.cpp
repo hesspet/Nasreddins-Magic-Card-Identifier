@@ -1,3 +1,10 @@
+/***************************************************************************
+ * Project: Esp32NMCI
+ * File: Utf8Decoder.cpp
+ * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
+ * Author: Peter Heß, Büdingen DE
+ ***************************************************************************/
+
 #include "Utf8Decoder.h"
 
 Utf8Decoder gUtf;
