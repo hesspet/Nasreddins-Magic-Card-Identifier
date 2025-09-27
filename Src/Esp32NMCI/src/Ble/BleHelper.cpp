@@ -13,16 +13,16 @@
 
 void BleHelper::SendTextToKeyboard(BleKeyboardCallback& keyboard, const String& text)
 {
-        if (text.length() == 0)
-        {
-                return;
-        }
+	if (text.length() == 0)
+	{
+		return;
+	}
 
-        if (!keyboard.isConnected())
-        {
-                Logger::LogWarn(F("BLE keyboard not connected; skipping payload transfer."));
-                return;
-        }
+	if (!keyboard.isConnected())
+	{
+		Logger::LogWarn(F("BLE keyboard not connected; skipping payload transfer."));
+		return;
+	}
 
-        keyboard.print(text);
+	keyboard.print(text);
 }

@@ -14,8 +14,8 @@
 
 class CardPayloadProcessor
 {
-    public:
-    CardPayloadProcessor() = default;
+public:
+	CardPayloadProcessor() = default;
 
-    std::vector<String> ProcessPayload(const String &payload);
+	std::vector<String> ProcessPayload(const String& payload);
 };

@@ -115,7 +115,7 @@ void CardReaderManager::handleTagDetected(const uint8_t* uid, uint8_t uidLength)
 
 	if (!ti.ccValid)
 	{
-                Logger::LogWarn(F("Warning: CC Magic != 0xE1 (possibly not an NDEF tag or CC corrupted)"));
+		Logger::LogWarn(F("Warning: CC Magic != 0xE1 (possibly not an NDEF tag or CC corrupted)"));
 	}
 
 	Logger::LogDebug(F("Probable type: "));

@@ -7,86 +7,86 @@
  *              long presses, and triggers configured actions.
  ***************************************************************************/
 
-// ButtonManager.cpp
+ // ButtonManager.cpp
 #include "ButtonManager.h"
 #include "../Logger/Logger.h"
 
 ButtonManager::ButtonManager(int pinA, int pinB)
-    : pinA(pinA), pinB(pinB)
+	: pinA(pinA), pinB(pinB)
 {
 }
 
 void ButtonManager::begin()
 {
-    pinMode(pinA, INPUT);
-    pinMode(pinB, INPUT);
+	pinMode(pinA, INPUT);
+	pinMode(pinB, INPUT);
 }
 
 void ButtonManager::update()
 {
-    // Button A (GPIO 0)
-    lastStateA = stateA;
-    stateA = digitalRead(pinA) == LOW;
-    if (stateA && !lastStateA && onButton0Pressed)
-    {
-        Logger::LogInfo(F("[ButtonManager] Button 0 pressed"));
-        onButton0Pressed();
-    }
+	// Button A (GPIO 0)
+	lastStateA = stateA;
+	stateA = digitalRead(pinA) == LOW;
+	if (stateA && !lastStateA && onButton0Pressed)
+	{
+		Logger::LogInfo(F("[ButtonManager] Button 0 pressed"));
+		onButton0Pressed();
+	}
 
-    // Button B (GPIO 35)
-    lastStateB = stateB;
-    stateB = digitalRead(pinB) == LOW;
+	// Button B (GPIO 35)
+	lastStateB = stateB;
+	stateB = digitalRead(pinB) == LOW;
 
-    if (stateB && !lastStateB)
-    {
-        pressStart35 = millis();
-    }
-    if (!stateB && lastStateB)
-    {
-        unsigned long duration = millis() - pressStart35;
-        if (duration >= longPressThreshold)
-        {
-            if (onButton35LongPressed)
-            {
-                Logger::LogInfo(F("[ButtonManager] Button 35 long press"));
-                onButton35LongPressed();
-            }
-        }
-        else if (onButton35Pressed)
-        {
-            Logger::LogInfo(F("[ButtonManager] Button 35 short press"));
-            onButton35Pressed();
-        }
-        pressStart35 = 0;
-    }
+	if (stateB && !lastStateB)
+	{
+		pressStart35 = millis();
+	}
+	if (!stateB && lastStateB)
+	{
+		unsigned long duration = millis() - pressStart35;
+		if (duration >= longPressThreshold)
+		{
+			if (onButton35LongPressed)
+			{
+				Logger::LogInfo(F("[ButtonManager] Button 35 long press"));
+				onButton35LongPressed();
+			}
+		}
+		else if (onButton35Pressed)
+		{
+			Logger::LogInfo(F("[ButtonManager] Button 35 short press"));
+			onButton35Pressed();
+		}
+		pressStart35 = 0;
+	}
 }
 
 bool ButtonManager::isButtonAPressed() const
 {
-    return stateA;
+	return stateA;
 }
 
 bool ButtonManager::isButtonBPressed() const
 {
-    return stateB;
+	return stateB;
 }
 
 bool ButtonManager::areBothButtonsPressed() const
 {
-    return stateA && stateB;
+	return stateA && stateB;
 }
 
 void ButtonManager::setOnButton0Pressed(std::function<void()> callback)
 {
-    onButton0Pressed = callback;
+	onButton0Pressed = callback;
 }
 
 void ButtonManager::setOnButton35Pressed(std::function<void()> callback)
 {
-    onButton35Pressed = callback;
+	onButton35Pressed = callback;
 }
 
 void ButtonManager::setOnButton35LongPressed(std::function<void()> callback)
 {
-    onButton35LongPressed = callback;
+	onButton35LongPressed = callback;
 }

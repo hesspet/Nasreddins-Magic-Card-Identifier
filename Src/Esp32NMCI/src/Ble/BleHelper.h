@@ -17,12 +17,12 @@ class BleKeyboardCallback;
  */
 class BleHelper
 {
-    public:
-    /**
-     * @brief Sends text via the provided BLE keyboard if a connection is established.
-     *
-     * @param keyboard BLE keyboard instance used to transmit the text.
-     * @param text UTF-8 encoded content to transmit.
-     */
-    static void SendTextToKeyboard(BleKeyboardCallback& keyboard, const String& text);
+public:
+	/**
+	 * @brief Sends text via the provided BLE keyboard if a connection is established.
+	 *
+	 * @param keyboard BLE keyboard instance used to transmit the text.
+	 * @param text UTF-8 encoded content to transmit.
+	 */
+	static void SendTextToKeyboard(BleKeyboardCallback& keyboard, const String& text);
 };

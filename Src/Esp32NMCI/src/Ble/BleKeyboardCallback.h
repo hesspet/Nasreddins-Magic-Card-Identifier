@@ -15,49 +15,49 @@
 #include "../Logger/Logger.h"
 
 
-/**
- * @brief Specialized keyboard emulation that emits additional log messages.
- */
+ /**
+  * @brief Specialized keyboard emulation that emits additional log messages.
+  */
 class BleKeyboardCallback final : public BleKeyboard
 {
 public:
-    using BleKeyboard::BleKeyboard;
+	using BleKeyboard::BleKeyboard;
 
-    void setDisplayManager(DisplayManager* manager)
-    {
-        displayManager = manager;
+	void setDisplayManager(DisplayManager* manager)
+	{
+		displayManager = manager;
 
-        if (displayManager != nullptr)
-        {
-            displayManager->setBleConnectionState(isConnected());
-        }
-    }
+		if (displayManager != nullptr)
+		{
+			displayManager->setBleConnectionState(isConnected());
+		}
+	}
 
 protected:
-    void onConnect(BLEServer* server, NimBLEConnInfo& connInfo) override
-    {
-        BleKeyboard::onConnect(server, connInfo);
-        Logger::LogInfo(F("[BLE] Connection established."));
-        if (displayManager != nullptr)
-        {
-            displayManager->setBleConnectionState(true);
-        }
-    }
+	void onConnect(BLEServer* server, NimBLEConnInfo& connInfo) override
+	{
+		BleKeyboard::onConnect(server, connInfo);
+		Logger::LogInfo(F("[BLE] Connection established."));
+		if (displayManager != nullptr)
+		{
+			displayManager->setBleConnectionState(true);
+		}
+	}
 
-    void onDisconnect(BLEServer* server, NimBLEConnInfo& connInfo, int reason) override
-    {
-        BleKeyboard::onDisconnect(server, connInfo, reason);
-        Logger::logf(Logger::Level::Info,
-            "[BLE] Disconnected (reason: %d).\n",
-            reason);
-        if (displayManager != nullptr)
-        {
-            displayManager->setBleConnectionState(false);
-        }
-        restartAdvertisingIfNecessary();
-    }
+	void onDisconnect(BLEServer* server, NimBLEConnInfo& connInfo, int reason) override
+	{
+		BleKeyboard::onDisconnect(server, connInfo, reason);
+		Logger::logf(Logger::Level::Info,
+			"[BLE] Disconnected (reason: %d).\n",
+			reason);
+		if (displayManager != nullptr)
+		{
+			displayManager->setBleConnectionState(false);
+		}
+		restartAdvertisingIfNecessary();
+	}
 
 private:
-    void restartAdvertisingIfNecessary();
-    DisplayManager* displayManager = nullptr;
+	void restartAdvertisingIfNecessary();
+	DisplayManager* displayManager = nullptr;
 };

@@ -8,26 +8,26 @@
  *              workflow.
  ***************************************************************************/
 
-/**************************************************************************/
-/*!
+ /**************************************************************************/
+ /*!
 
-  Esp32NMCI.ino
+   Esp32NMCI.ino
 
-  ESP32 T-Display + PN532 (HSU/UART)
-  Detection of Type-2 tags via capability container (page 3),
-  dynamic reading of the complete user memory (from page 4 onwards),
-  TLV parsing, NDEF parsing (first record) with optional text output.
+   ESP32 T-Display + PN532 (HSU/UART)
+   Detection of Type-2 tags via capability container (page 3),
+   dynamic reading of the complete user memory (from page 4 onwards),
+   TLV parsing, NDEF parsing (first record) with optional text output.
 
-  Wiring (HSU/UART):
-                                ESP32 TX (GPIO 25) → PN532 RX
-                                ESP32 RX (GPIO 26) → PN532 TX
-                                3.3 V logic level, PN532 configured for HSU/UART
+   Wiring (HSU/UART):
+								 ESP32 TX (GPIO 25) → PN532 RX
+								 ESP32 RX (GPIO 26) → PN532 TX
+								 3.3 V logic level, PN532 configured for HSU/UART
 
-  Serial output: 115200 baud
-*/
-/**************************************************************************/
+   Serial output: 115200 baud
+ */
+ /**************************************************************************/
 
-// BLE handling – keyboard emulation
+ // BLE handling – keyboard emulation
 #include <NimBLEDevice.h> // 2.3.6
 #include <BleKeyboard.h> // Manually patched for NimBLE 2.3.6!
 
@@ -138,20 +138,20 @@ static void OnNewData(const String& payloadText)
 
 	Logger::LogInfo(F("Processed card payload values:"));
 
-        for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
-        {
-                if (index == 0)
-                {
-                        // Display the primary entry immediately
-                        displayManager.showMessage(ListElementsInPayloadFromCard[index]);
+	for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
+	{
+		if (index == 0)
+		{
+			// Display the primary entry immediately
+			displayManager.showMessage(ListElementsInPayloadFromCard[index]);
 
-                }
+		}
 		Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
 	}
 
 	displayManager.showMessage(ListElementsInPayloadFromCard);
 
-        BleHelper::SendTextToKeyboard(gbleKeyboard, ListElementsInPayloadFromCard.front());
+	BleHelper::SendTextToKeyboard(gbleKeyboard, ListElementsInPayloadFromCard.front());
 
 }
 
@@ -160,7 +160,7 @@ static void OnNewData(const String& payloadText)
  */
 void setup()
 {
-        Logger::begin(115200, true, Logger::Level::Info);
+	Logger::begin(115200, true, Logger::Level::Info);
 
 	displayManager.begin(DisplayManager::Orientation::UsbLeft);
 	Logger::setDisplayManager(&displayManager);
@@ -168,11 +168,11 @@ void setup()
 
 	cardReaderManager.setNewDataCallback(OnNewData);
 	cardReaderManager.begin();
-        buttonManager.begin();
-        buttonManager.setOnButton35LongPressed(SystemHelper::EnterDeepSleep);
+	buttonManager.begin();
+	buttonManager.setOnButton35LongPressed(SystemHelper::EnterDeepSleep);
 
 	Serial.println();
-        Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) - Boot-Protocol-First"));
+	Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) - Boot-Protocol-First"));
 	gbleKeyboard.begin();
 }
 
@@ -187,14 +187,14 @@ void loop()
 
 		if (!gbleKeyboard.isConnected())
 		{
-                        if (b <= 0x7F)
-                        {
-                                Serial.printf("[WARN] Not connected: '%c' (0x%02X)\n", static_cast<char>(b), static_cast<unsigned>(b));
-                        }
-                        else
-                        {
-                                Serial.printf("[WARN] Not connected: U+%04lX\n", static_cast<unsigned long>(b));
-                        }
+			if (b <= 0x7F)
+			{
+				Serial.printf("[WARN] Not connected: '%c' (0x%02X)\n", static_cast<char>(b), static_cast<unsigned>(b));
+			}
+			else
+			{
+				Serial.printf("[WARN] Not connected: U+%04lX\n", static_cast<unsigned long>(b));
+			}
 			continue;
 		}
 		gbleKeyboard.print(b);
