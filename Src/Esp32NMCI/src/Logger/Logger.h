@@ -46,7 +46,7 @@ public:
 	static void begin(unsigned long baudRate = 115200, bool waitForSerial = true,
 		Level filterLevel = Level::Debug);
 
-	static void setDisplayManager(_displayManager* displayManager);
+	static void setDisplayManager(DisplayManager* displayManager);
 
 	/**
 	 * @brief Emits an empty log line, separating two messages.
@@ -323,5 +323,5 @@ private:
 
 	static bool s_atLineStart;
 	static Level s_filterLevel;
-	static _displayManager* s_displayManager;
+	static DisplayManager* s_displayManager;
 };

@@ -13,7 +13,7 @@
 
 bool Logger::s_atLineStart = true;
 Logger::Level Logger::s_filterLevel = Logger::Level::Debug;
-_displayManager* Logger::s_displayManager = nullptr;
+DisplayManager* Logger::s_displayManager = nullptr;
 
 void Logger::begin(unsigned long baudRate, bool waitForSerial, Level filterLevel)
 {
@@ -29,7 +29,7 @@ void Logger::begin(unsigned long baudRate, bool waitForSerial, Level filterLevel
 	s_atLineStart = true;
 }
 
-void Logger::setDisplayManager(_displayManager* displayManager)
+void Logger::setDisplayManager(DisplayManager* displayManager)
 {
 	s_displayManager = displayManager;
 }

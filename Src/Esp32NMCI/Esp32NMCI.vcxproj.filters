@@ -57,6 +57,9 @@
     <ClCompile Include="src\Ble\BleKeyboardCallback.cpp">
       <Filter>Src</Filter>
     </ClCompile>
+    <ClCompile Include="src\Helper\SystemHelper.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="__vm\.Esp32NMCI.vsarduino.h">
@@ -91,5 +94,6 @@
     </ClInclude>
     <ClInclude Include="src\Ble\BleHelper.h" />
     <ClInclude Include="src\Ble\BleKeyboardCallback.h" />
+    <ClInclude Include="src\Helper\SystemHelper.h" />
   </ItemGroup>
 </Project>
