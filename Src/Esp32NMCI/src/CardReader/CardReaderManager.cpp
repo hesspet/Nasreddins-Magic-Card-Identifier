@@ -14,7 +14,7 @@
 
 #include "../Logger/Logger.h"
 
-#define W01 F("W01 Datensatz 1 nicht vorhanden!") // previously "Failed to parse first NDEF record"
+#define W01 F("W01 Record 1 not available!") // previously "Failed to parse first NDEF record"
 
 CardReaderManager::CardReaderManager(PN532& nfc, Type2TagReader& tagReader, NdefHelper& ndefHelper)
 	: nfc_(nfc), tagReader_(tagReader), ndefHelper_(ndefHelper)
@@ -115,7 +115,7 @@ void CardReaderManager::handleTagDetected(const uint8_t* uid, uint8_t uidLength)
 
 	if (!ti.ccValid)
 	{
-		Logger::LogWarn(F("Warning: CC Magic != 0xE1 (evtl. kein NDEF-Tag oder CC korrupt)"));
+                Logger::LogWarn(F("Warning: CC Magic != 0xE1 (possibly not an NDEF tag or CC corrupted)"));
 	}
 
 	Logger::LogDebug(F("Probable type: "));
