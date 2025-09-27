@@ -26,32 +26,37 @@ void CardReaderManager::setNewDataCallback(NewDataCallback callback)
 	newDataCallback_ = callback;
 }
 
-void CardReaderManager::begin()
+void CardReaderManager::begin(NewDataCallback callback)
 {
-	PN532_HSU_PORT.begin(PN532_HSU_BAUDRATE, SERIAL_8N1, PN532_HSU_RX_PIN, PN532_HSU_TX_PIN);
-	nfc_.begin();
+        if (callback != nullptr)
+        {
+                setNewDataCallback(callback);
+        }
+
+        PN532_HSU_PORT.begin(PN532_HSU_BAUDRATE, SERIAL_8N1, PN532_HSU_RX_PIN, PN532_HSU_TX_PIN);
+        nfc_.begin();
 
 	uint32_t versiondata = nfc_.getFirmwareVersion();
 	if (!versiondata)
 	{
-		Logger::LogInfo(F("PN532 not found (check wiring & HSU mode)"));
+		Logger::logInfo(F("PN532 not found (check wiring & HSU mode)"));
 		while (true)
 		{
 			delay(1000);
 		}
 	}
 
-	Logger::LogInfo(F("Found chip PN5"), false);
-	Logger::LogInfo((versiondata >> 24) & 0xFF, true, HEX);
-	Logger::LogInfo(F("Firmware ver. "), false);
-	Logger::LogInfo((versiondata >> 16) & 0xFF, false, DEC);
-	Logger::LogInfo('.', false);
-	Logger::LogInfo((versiondata >> 8) & 0xFF, true, DEC);
+	Logger::logInfo(F("Found chip PN5"), false);
+	Logger::logInfo((versiondata >> 24) & 0xFF, true, HEX);
+	Logger::logInfo(F("Firmware ver. "), false);
+	Logger::logInfo((versiondata >> 16) & 0xFF, false, DEC);
+	Logger::logInfo('.', false);
+	Logger::logInfo((versiondata >> 8) & 0xFF, true, DEC);
 
 	nfc_.SAMConfig();
 	nfc_.setPassiveActivationRetries(0xFF);
 
-	Logger::LogInfo(F("Initialized"));
+	Logger::logInfo(F("Initialized"));
 	Logger::LogDebug(F("Waiting for an ISO14443A Card ..."));
 }
 
@@ -95,7 +100,7 @@ void CardReaderManager::handleTagDetected(const uint8_t* uid, uint8_t uidLength)
 	Type2TagReader::TagInfo ti{};
 	if (!tagReader_.readCapabilityContainer(ti))
 	{
-		Logger::LogWarn(F("Failed to read Capability Container (page 3)"));
+		Logger::logWarn(F("Failed to read Capability Container (page 3)"));
 		return;
 	}
 
@@ -115,7 +120,7 @@ void CardReaderManager::handleTagDetected(const uint8_t* uid, uint8_t uidLength)
 
 	if (!ti.ccValid)
 	{
-		Logger::LogWarn(F("Warning: CC Magic != 0xE1 (possibly not an NDEF tag or CC corrupted)"));
+		Logger::logWarn(F("Warning: CC Magic != 0xE1 (possibly not an NDEF tag or CC corrupted)"));
 	}
 
 	Logger::LogDebug(F("Probable type: "));
@@ -142,12 +147,12 @@ void CardReaderManager::handleTagDetected(const uint8_t* uid, uint8_t uidLength)
 		}
 		else
 		{
-			Logger::LogWarn(W01, true, Logger::kNoBase, true); // war "Failed to parse first NDEF record"
+			Logger::logWarn(W01, true, Logger::kNoBase, true); // war "Failed to parse first NDEF record"
 		}
 	}
 	else
 	{
-		Logger::LogWarn(F("No NDEF TLV found (0x03)"));
+		Logger::logWarn(F("No NDEF TLV found (0x03)"));
 	}
 }
 
@@ -177,7 +182,7 @@ bool CardReaderManager::resolvePayloadText(const NdefHelper::NdefRecord& record,
 {
 	if (!record.payload || record.payloadLen == 0)
 	{
-		Logger::LogWarn(F("Received record with empty payload."));
+		Logger::logWarn(F("Received record with empty payload."));
 		return false;
 	}
 
@@ -185,7 +190,7 @@ bool CardReaderManager::resolvePayloadText(const NdefHelper::NdefRecord& record,
 	{
 		if (record.payloadLen < 1)
 		{
-			Logger::LogInfo(F("Empty RTD/T payload"));
+			Logger::logInfo(F("Empty RTD/T payload"));
 			return false;
 		}
 
@@ -195,7 +200,7 @@ bool CardReaderManager::resolvePayloadText(const NdefHelper::NdefRecord& record,
 
 		if (record.payloadLen < static_cast<size_t>(1 + langLen))
 		{
-			Logger::LogInfo(F("RTD/T payload too short"));
+			Logger::logInfo(F("RTD/T payload too short"));
 			return false;
 		}
 
@@ -225,7 +230,7 @@ bool CardReaderManager::resolvePayloadText(const NdefHelper::NdefRecord& record,
 		return true;
 	}
 
-	Logger::LogWarn(F("First NDEF record is not a Text (RTD/T) record."));
+	Logger::logWarn(F("First NDEF record is not a Text (RTD/T) record."));
 	Logger::LogDebug(F("Payload (hex):"));
 	resolvedText = ndefHelper_.getString(record.payload, record.payloadLen);
 	return true;
