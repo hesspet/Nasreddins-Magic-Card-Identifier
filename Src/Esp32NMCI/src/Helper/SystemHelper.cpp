@@ -15,7 +15,7 @@
 
 void SystemHelper::EnterDeepSleep()
 {
-	Logger::LogInfo(F("[System] Entering deep sleep"));
+	Logger::logInfo(F("[System] Entering deep sleep"));
 	esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 0);
 	esp_deep_sleep_start();
 }

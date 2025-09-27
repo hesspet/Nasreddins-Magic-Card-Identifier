@@ -132,11 +132,11 @@ static void OnNewData(const String& payloadText)
 
 	if (_listElementsInPayloadFromCard.empty())
 	{
-		Logger::LogWarn(F("Received empty card payload."));
+		Logger::logWarn(F("Received empty card payload."));
 		return;
 	}
 
-	Logger::LogInfo(F("Processed card payload values:"));
+	Logger::logInfo(F("Processed card payload values:"));
 
 	for (size_t index = 0; index < _listElementsInPayloadFromCard.size(); ++index)
 	{
@@ -151,7 +151,7 @@ static void OnNewData(const String& payloadText)
 
 	_displayManager.showMessage(_listElementsInPayloadFromCard);
 
-	BleHelper::SendTextToKeyboard(_bleKeyboardCallbackHandler, _listElementsInPayloadFromCard.front());
+	BleHelper::sendTextToKeyboard(_bleKeyboardCallbackHandler, _listElementsInPayloadFromCard.front());
 
 }
 
