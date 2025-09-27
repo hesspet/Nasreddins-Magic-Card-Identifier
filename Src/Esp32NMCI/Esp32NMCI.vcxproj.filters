@@ -51,6 +51,9 @@
     <ClCompile Include="src\Helper\Utf8Decoder.cpp">
       <Filter>Src\Helper</Filter>
     </ClCompile>
+    <ClCompile Include="src\Ble\BleHelper.cpp">
+      <Filter>Src</Filter>
+    </ClCompile>
     <ClCompile Include="src\Ble\BleKeyboardCallback.cpp">
       <Filter>Src</Filter>
     </ClCompile>
@@ -86,6 +89,7 @@
     <ClInclude Include="src\Helper\Utf8Decoder.h">
       <Filter>Src\Helper</Filter>
     </ClInclude>
+    <ClInclude Include="src\Ble\BleHelper.h" />
     <ClInclude Include="src\Ble\BleKeyboardCallback.h" />
   </ItemGroup>
 </Project>
