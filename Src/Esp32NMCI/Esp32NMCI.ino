@@ -164,10 +164,10 @@ void setup()
 
 	_displayManager.begin(DisplayManager::Orientation::UsbLeft);
 	Logger::setDisplayManager(&_displayManager);
-	
+
 	_bleKeyboardCallbackHandler.setDisplayManager(&_displayManager);
 
-        _cardReaderManager.begin(OnNewData);
+	_cardReaderManager.begin(OnNewData);
 	_buttonManager.begin();
 	_buttonManager.setOnButton35LongPressed(SystemHelper::EnterDeepSleep);
 
