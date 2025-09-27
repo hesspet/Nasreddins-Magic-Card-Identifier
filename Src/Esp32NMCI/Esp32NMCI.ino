@@ -41,7 +41,6 @@
 
 // Miscellaneous helpers :-)
 #include <vector>
-#include <esp_sleep.h>
 
 // Implementation
 #include "src/config.h"
@@ -53,6 +52,7 @@
 #include "src/Presentation/DisplayManager.h"
 #include "src/Presentation/ButtonManager.h"
 #include "src/Helper/Utf8Decoder.h"
+#include "src/Helper/SystemHelper.h"
 #include "src/Ble/BleKeyboardCallback.h"
 
 // Card reader
@@ -176,16 +176,6 @@ static void OnNewData(const String& payloadText)
 }
 
 /**
- * @brief Puts the ESP32 into deep sleep and enables wake-up via GPIO 35.
- */
-static void EnterDeepSleep()
-{
-        Logger::LogInfo(F("[System] Entering deep sleep"));
-	esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 0);
-	esp_deep_sleep_start();
-}
-
-/**
  * @brief Arduino initialization: sets up the logger, display, card reader, and BLE.
  */
 void setup()
@@ -198,8 +188,8 @@ void setup()
 
 	cardReaderManager.setNewDataCallback(OnNewData);
 	cardReaderManager.begin();
-	buttonManager.begin();
-	buttonManager.setOnButton35LongPressed(EnterDeepSleep);
+        buttonManager.begin();
+        buttonManager.setOnButton35LongPressed(SystemHelper::EnterDeepSleep);
 
 	Serial.println();
         Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) - Boot-Protocol-First"));
