@@ -3,8 +3,8 @@
  * File: Logger.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Deklariert das Logging-Subsystem mit Anzeigeintegration, das
- *              formatierte Ausgaben verschiedener Schweregrade bereitstellt.
+ * Description: Declares the logging subsystem with display integration that
+ *              provides formatted output across multiple severity levels.
  ***************************************************************************/
 
 #pragma once

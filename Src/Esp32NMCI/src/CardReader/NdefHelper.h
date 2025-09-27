@@ -3,8 +3,8 @@
  * File: NdefHelper.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Deklariert Funktionen zum Parsen von TLV- und NDEF-Strukturen
- *              aus den ausgelesenen NFC-Tag-Daten.
+ * Description: Declares functions for parsing TLV and NDEF structures from the
+ *              NFC tag data that has been read.
  ***************************************************************************/
 
 #pragma once

@@ -3,9 +3,9 @@
  * File: Esp32NMCI.ino
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Hauptsketch, der Display, Taster, BLE-Tastatur und NFC-Leser
- *              initialisiert und die komplette Kartenverarbeitungslogik
- *              orchestriert.
+ * Description: Main sketch that initializes the display, buttons, BLE keyboard,
+ *              and NFC reader while orchestrating the complete card processing
+ *              workflow.
  ***************************************************************************/
 
 /**************************************************************************/
@@ -14,32 +14,32 @@
   Esp32NMCI.ino
 
   ESP32 T-Display + PN532 (HSU/UART)
-  Erkennung von Type-2-Tag via Capability Container (Page 3),
-  dynamisches Lesen des gesamten User-Memory (ab Page 4),
-  TLV-Parsing, NDEF-Parsing (erster Record) optional Textausgabe.
+  Detection of Type-2 tags via capability container (page 3),
+  dynamic reading of the complete user memory (from page 4 onwards),
+  TLV parsing, NDEF parsing (first record) with optional text output.
 
-  Verkabelung (HSU/UART):
-				ESP32 TX (GPIO 25) → PN532 RX
-				ESP32 RX (GPIO 26) → PN532 TX
-				3,3V Pegel, PN532 auf HSU/UART gestellt
+  Wiring (HSU/UART):
+                                ESP32 TX (GPIO 25) → PN532 RX
+                                ESP32 RX (GPIO 26) → PN532 TX
+                                3.3 V logic level, PN532 configured for HSU/UART
 
-  Serielle Ausgabe: 115200 Baud
+  Serial output: 115200 baud
 */
 /**************************************************************************/
 
-// Ble Handling - Keyboard Emulation
+// BLE handling – keyboard emulation
 #include <NimBLEDevice.h> // 2.3.6
-#include <BleKeyboard.h> // Hinweis: Manuell gepatched für NimBLE 2.3.6!
+#include <BleKeyboard.h> // Manually patched for NimBLE 2.3.6!
 
-// Für T-Disüplay notwendig
+// Required for the T-Display
 #include <SPI.h>
 #include <TFT_eSPI.h>
 
-// Card Reader
+// Card reader
 #include <PN532.h>
 #include <PN532_HSU.h>
 
-// Stuff :-)
+// Miscellaneous helpers :-)
 #include <vector>
 #include <esp_sleep.h>
 
@@ -55,74 +55,74 @@
 #include "src/Helper/Utf8Decoder.h"
 #include "src/Ble/BleKeyboardCallback.h"
 
-// Card Reader
+// Card reader
 
 /**
- * @brief High-Speed-UART-Schnittstelle zum PN532-Modul.
+ * @brief High-speed UART interface to the PN532 module.
  */
 static PN532_HSU pn532hsu(PN532_HSU_PORT);
 
 /**
- * @brief PN532-Instanz zur Kommunikation mit dem NFC-Leser.
+ * @brief PN532 instance used to communicate with the NFC reader.
  */
 static PN532 nfc(pn532hsu);
 
 /**
- * @brief Reader für MIFARE-Type-2-Tags basierend auf dem PN532.
+ * @brief Reader for MIFARE Type 2 tags using the PN532.
  */
 static Type2TagReader tagReader(nfc);
 
 /**
- * @brief Hilfsklasse zum Interpretieren von NDEF-Daten.
+ * @brief Helper class for interpreting NDEF data.
  */
 static NdefHelper ndefHelper;
 
 /**
- * @brief Steuerung der Kartenleser-Logik inklusive Callback-Registrierung.
+ * @brief Coordinates the card reader logic, including callback registration.
  */
 static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
 
 /**
- * @brief Verarbeitet Kartendaten zu anzeigbaren bzw. übertragbaren Listen.
+ * @brief Processes card data into displayable or transferable lists.
  */
 static CardPayloadProcessor cardPayloadProcessor;
 
 /**
- * @brief Zwischenspeicher für die aus einer Karte extrahierten Nutzdaten.
+ * @brief Temporary storage for the payload extracted from a card.
  */
 static std::vector<String> ListElementsInPayloadFromCard;
 
 // Display
 
 /**
- * @brief Manager für die Ausgabe auf dem integrierten T-Display.
+ * @brief Manager responsible for rendering content on the integrated T-Display.
  */
 static DisplayManager displayManager;
 
 /**
- * @brief GPIO des ersten Tasters (Boot-Button).
+ * @brief GPIO of the first button (boot button).
  */
 constexpr int kButtonPin0 = 0;
 
 /**
- * @brief GPIO des zweiten Tasters, dient gleichzeitig als Wake-Up-Quelle.
+ * @brief GPIO of the second button, also used as the wake-up source.
  */
 constexpr int kButtonPin35 = 35;
 
 /**
- * @brief Verwaltung der physischen Taster inklusive Entprellung.
+ * @brief Manages the physical buttons, including debouncing.
  */
 static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
 
 /**
- * @brief Globale Instanz der BLE-Tastaturemulation.
+ * @brief Global instance of the BLE keyboard emulation.
  */
 static BleKeyboardCallback gbleKeyboard;
 
 /**
- * @brief Sendet einen Text über die BLE-Tastatur, sofern eine Verbindung besteht.
+ * @brief Sends text via the BLE keyboard if a connection is established.
  *
- * @param text UTF-8-kodierter Inhalt, der übertragen werden soll.
+ * @param text UTF-8 encoded content to transmit.
  */
 static void SendTextToKeyboard(const String& text)
 {
@@ -141,9 +141,10 @@ static void SendTextToKeyboard(const String& text)
 }
 
 /**
- * @brief Callback bei neuen Kartendaten zur Anzeige und Weitergabe per BLE.
+ * @brief Callback invoked when new card data is available to display and
+ *        forward via BLE.
  *
- * @param payloadText Rohtext der ausgelesenen Karte.
+ * @param payloadText Raw text read from the card.
  */
 static void OnNewData(const String& payloadText)
 {
@@ -157,14 +158,14 @@ static void OnNewData(const String& payloadText)
 
 	Logger::LogInfo(F("Processed card payload values:"));
 
-	for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
-	{
-		if (index == 0)
-		{
-			// Ausgabe des Kürzels
-			displayManager.showMessage(ListElementsInPayloadFromCard[index]);
+        for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
+        {
+                if (index == 0)
+                {
+                        // Display the primary entry immediately
+                        displayManager.showMessage(ListElementsInPayloadFromCard[index]);
 
-		}
+                }
 		Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
 	}
 
@@ -175,21 +176,21 @@ static void OnNewData(const String& payloadText)
 }
 
 /**
- * @brief Versetzt den ESP32 in den Tiefschlaf und aktiviert Wake-Up über GPIO 35.
+ * @brief Puts the ESP32 into deep sleep and enables wake-up via GPIO 35.
  */
 static void EnterDeepSleep()
 {
-	Logger::LogInfo(F("[System] Entering deep sleep"));
+        Logger::LogInfo(F("[System] Entering deep sleep"));
 	esp_sleep_enable_ext0_wakeup(GPIO_NUM_35, 0);
 	esp_deep_sleep_start();
 }
 
 /**
- * @brief Arduino-Initialisierung: richtet Logger, Anzeige, Kartenleser und BLE ein.
+ * @brief Arduino initialization: sets up the logger, display, card reader, and BLE.
  */
 void setup()
 {
-	Logger::begin(115200, true, Logger::Level::Info);
+        Logger::begin(115200, true, Logger::Level::Info);
 
 	displayManager.begin(DisplayManager::Orientation::UsbLeft);
 	Logger::setDisplayManager(&displayManager);
@@ -206,7 +207,7 @@ void setup()
 }
 
 /**
- * @brief Hauptschleife zum Auswerten der seriellen Schnittstelle und Eingaben.
+ * @brief Main loop handling serial input and user interactions.
  */
 void loop()
 {

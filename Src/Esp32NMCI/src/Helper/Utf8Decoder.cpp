@@ -3,8 +3,8 @@
  * File: Utf8Decoder.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Liefert die Zustandsmaschine zur UTF-8-Dekodierung für den
- *              zeichenweisen Empfang von Kartendaten.
+ * Description: Provides the state machine used to decode UTF-8 while receiving
+ *              card data one character at a time.
  ***************************************************************************/
 
 #include "Utf8Decoder.h"

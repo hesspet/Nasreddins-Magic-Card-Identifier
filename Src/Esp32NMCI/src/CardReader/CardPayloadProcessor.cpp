@@ -3,8 +3,8 @@
  * File: CardPayloadProcessor.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Implementiert das Zerlegen von Nutztexten in maximal fünf
- *              bereinigte Werte und protokolliert Sonderfälle der Eingabe.
+ * Description: Implements splitting payload text into up to five sanitized
+ *              values and logs exceptional input conditions.
  ***************************************************************************/
 
 #include "CardPayloadProcessor.h"

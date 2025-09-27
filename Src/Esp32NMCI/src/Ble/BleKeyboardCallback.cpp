@@ -3,8 +3,8 @@
  * File: BleKeyboardCallback.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Implementiert die Logik zum Neustarten des BLE-Advertisings
- *              nach Verbindungsabbrüchen und ergänzt Diagnoseausgaben.
+ * Description: Implements the logic that restarts BLE advertising after
+ *              disconnects and adds diagnostic output.
  ***************************************************************************/
 
 #include "BleKeyboardCallback.h"
@@ -47,6 +47,6 @@ void BleKeyboardCallback::restartAdvertisingIfNecessary()
         Logger::LogError(F("[BLE] Advertising konnte nach Trennung nicht gestartet werden."));
     }
 #else
-    // Klassischer BLE-Stack: das Basismodul übernimmt den Neustart des Advertisings.
+    // Classic BLE stack: the base module takes care of restarting advertising.
 #endif
 }

@@ -3,8 +3,8 @@
  * File: CardReaderManager.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Enthält die Laufzeitlogik zur Initialisierung des PN532, zum
- *              Erfassen von Type-2-Tags und zum Weiterreichen der NDEF-Daten.
+ * Description: Contains the runtime logic for initializing the PN532, detecting
+ *              Type 2 tags, and forwarding NDEF data.
  ***************************************************************************/
 
 #include "CardReaderManager.h"
@@ -14,7 +14,7 @@
 
 #include "../Logger/Logger.h"
 
-#define W01 F("W01 Datensatz 1 nicht vorhanden!") // war "Failed to parse first NDEF record"
+#define W01 F("W01 Datensatz 1 nicht vorhanden!") // previously "Failed to parse first NDEF record"
 
 CardReaderManager::CardReaderManager(PN532& nfc, Type2TagReader& tagReader, NdefHelper& ndefHelper)
 	: nfc_(nfc), tagReader_(tagReader), ndefHelper_(ndefHelper)

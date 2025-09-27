@@ -3,8 +3,8 @@
  * File: Utf8Decoder.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Deklaration eines kleinen Zustandsautomaten zum Streamen und
- *              Dekodieren von UTF-8-Eingabedaten in Unicode-Codepoints.
+ * Description: Declares a lightweight state machine for streaming and decoding
+ *              UTF-8 input data into Unicode code points.
  ***************************************************************************/
 
 #pragma once
