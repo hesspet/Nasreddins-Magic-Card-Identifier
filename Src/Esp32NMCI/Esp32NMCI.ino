@@ -54,6 +54,7 @@
 #include "src/Helper/Utf8Decoder.h"
 #include "src/Helper/SystemHelper.h"
 #include "src/Ble/BleKeyboardCallback.h"
+#include "src/Ble/BleHelper.h"
 
 // Card reader
 
@@ -120,27 +121,6 @@ static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
 static BleKeyboardCallback gbleKeyboard;
 
 /**
- * @brief Sends text via the BLE keyboard if a connection is established.
- *
- * @param text UTF-8 encoded content to transmit.
- */
-static void SendTextToKeyboard(const String& text)
-{
-	if (text.length() == 0)
-	{
-		return;
-	}
-
-	if (!gbleKeyboard.isConnected())
-	{
-		Logger::LogWarn(F("BLE keyboard not connected; skipping payload transfer."));
-		return;
-	}
-
-	gbleKeyboard.print(text);
-}
-
-/**
  * @brief Callback invoked when new card data is available to display and
  *        forward via BLE.
  *
@@ -171,7 +151,7 @@ static void OnNewData(const String& payloadText)
 
 	displayManager.showMessage(ListElementsInPayloadFromCard);
 
-	SendTextToKeyboard(ListElementsInPayloadFromCard.front());
+        BleHelper::SendTextToKeyboard(gbleKeyboard, ListElementsInPayloadFromCard.front());
 
 }
 
