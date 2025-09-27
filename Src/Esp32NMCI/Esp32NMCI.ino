@@ -61,44 +61,44 @@
 /**
  * @brief High-speed UART interface to the PN532 module.
  */
-static PN532_HSU pn532hsu(PN532_HSU_PORT);
+static PN532_HSU _pn532hsu(PN532_HSU_PORT);
 
 /**
  * @brief PN532 instance used to communicate with the NFC reader.
  */
-static PN532 nfc(pn532hsu);
+static PN532 _nfc(_pn532hsu);
 
 /**
  * @brief Reader for MIFARE Type 2 tags using the PN532.
  */
-static Type2TagReader tagReader(nfc);
+static Type2TagReader _tagReader(_nfc);
 
 /**
  * @brief Helper class for interpreting NDEF data.
  */
-static NdefHelper ndefHelper;
+static NdefHelper _ndefHelper;
 
 /**
  * @brief Coordinates the card reader logic, including callback registration.
  */
-static CardReaderManager cardReaderManager(nfc, tagReader, ndefHelper);
+static CardReaderManager _cardReaderManager(_nfc, _tagReader, _ndefHelper);
 
 /**
  * @brief Processes card data into displayable or transferable lists.
  */
-static CardPayloadProcessor cardPayloadProcessor;
+static CardPayloadProcessor _cardPayloadProcessor;
 
 /**
  * @brief Temporary storage for the payload extracted from a card.
  */
-static std::vector<String> ListElementsInPayloadFromCard;
+static std::vector<String> _listElementsInPayloadFromCard;
 
 // Display
 
 /**
  * @brief Manager responsible for rendering content on the integrated T-Display.
  */
-static DisplayManager displayManager;
+static DisplayManager _displayManager;
 
 /**
  * @brief GPIO of the first button (boot button).
@@ -113,12 +113,12 @@ constexpr int kButtonPin35 = 35;
 /**
  * @brief Manages the physical buttons, including debouncing.
  */
-static ButtonManager buttonManager(kButtonPin0, kButtonPin35);
+static ButtonManager _buttonManager(kButtonPin0, kButtonPin35);
 
 /**
  * @brief Global instance of the BLE keyboard emulation.
  */
-static BleKeyboardCallback gbleKeyboard;
+static BleKeyboardCallback _bleKeyboardCallbackHandler;
 
 /**
  * @brief Callback invoked when new card data is available to display and
@@ -128,9 +128,9 @@ static BleKeyboardCallback gbleKeyboard;
  */
 static void OnNewData(const String& payloadText)
 {
-	ListElementsInPayloadFromCard = cardPayloadProcessor.ProcessPayload(payloadText);
+	_listElementsInPayloadFromCard = _cardPayloadProcessor.ProcessPayload(payloadText);
 
-	if (ListElementsInPayloadFromCard.empty())
+	if (_listElementsInPayloadFromCard.empty())
 	{
 		Logger::LogWarn(F("Received empty card payload."));
 		return;
@@ -138,20 +138,20 @@ static void OnNewData(const String& payloadText)
 
 	Logger::LogInfo(F("Processed card payload values:"));
 
-	for (size_t index = 0; index < ListElementsInPayloadFromCard.size(); ++index)
+	for (size_t index = 0; index < _listElementsInPayloadFromCard.size(); ++index)
 	{
 		if (index == 0)
 		{
 			// Display the primary entry immediately
-			displayManager.showMessage(ListElementsInPayloadFromCard[index]);
+			_displayManager.showMessage(_listElementsInPayloadFromCard[index]);
 
 		}
-		Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), ListElementsInPayloadFromCard[index].c_str());
+		Logger::logf(Logger::Level::Info, "  [%u] %s\n", static_cast<unsigned>(index), _listElementsInPayloadFromCard[index].c_str());
 	}
 
-	displayManager.showMessage(ListElementsInPayloadFromCard);
+	_displayManager.showMessage(_listElementsInPayloadFromCard);
 
-	BleHelper::SendTextToKeyboard(gbleKeyboard, ListElementsInPayloadFromCard.front());
+	BleHelper::SendTextToKeyboard(_bleKeyboardCallbackHandler, _listElementsInPayloadFromCard.front());
 
 }
 
@@ -162,18 +162,19 @@ void setup()
 {
 	Logger::begin(115200, true, Logger::Level::Info);
 
-	displayManager.begin(DisplayManager::Orientation::UsbLeft);
-	Logger::setDisplayManager(&displayManager);
-	gbleKeyboard.setDisplayManager(&displayManager);
+	_displayManager.begin(DisplayManager::Orientation::UsbLeft);
+	Logger::setDisplayManager(&_displayManager);
+	
+	_bleKeyboardCallbackHandler.setDisplayManager(&_displayManager);
 
-	cardReaderManager.setNewDataCallback(OnNewData);
-	cardReaderManager.begin();
-	buttonManager.begin();
-	buttonManager.setOnButton35LongPressed(SystemHelper::EnterDeepSleep);
+	_cardReaderManager.setNewDataCallback(OnNewData);
+	_cardReaderManager.begin();
+	_buttonManager.begin();
+	_buttonManager.setOnButton35LongPressed(SystemHelper::EnterDeepSleep);
 
 	Serial.println();
 	Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) - Boot-Protocol-First"));
-	gbleKeyboard.begin();
+	_bleKeyboardCallbackHandler.begin();
 }
 
 /**
@@ -181,6 +182,8 @@ void setup()
  */
 void loop()
 {
+
+#ifdef SERIAL_INPUT_ALLOWED
 	while (Serial.available())
 	{
 		const uint8_t b = static_cast<uint8_t>(Serial.read());
@@ -189,19 +192,20 @@ void loop()
 		{
 			if (b <= 0x7F)
 			{
-				Serial.printf("[WARN] Not connected: '%c' (0x%02X)\n", static_cast<char>(b), static_cast<unsigned>(b));
+				Serial.printf("[WARN] Not connected as keyboard: '%c' (0x%02X)\n", static_cast<char>(b), static_cast<unsigned>(b));
 			}
 			else
 			{
-				Serial.printf("[WARN] Not connected: U+%04lX\n", static_cast<unsigned long>(b));
+				Serial.printf("[WARN] Not connected as keyboard: U+%04lX\n", static_cast<unsigned long>(b));
 			}
 			continue;
 		}
 		gbleKeyboard.print(b);
 	}
+#endif
 
-	buttonManager.update();
-	cardReaderManager.process();
-	displayManager.update();
+	_buttonManager.update();
+	_cardReaderManager.process();
+	_displayManager.update();
 }
 

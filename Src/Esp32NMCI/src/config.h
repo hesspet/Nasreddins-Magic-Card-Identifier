@@ -11,7 +11,10 @@
 
 #include <stdint.h>
 
- // Splash text shown during startup
+ // Remove comment if you like to wirte data to card withou card reader via serial input
+ // #define SERIAL_INPUT_ALLOWED
+
+  // Splash text shown during startup
 #define VERSION_TEXT "NMCI V1.1"
 
 // Serial port used to communicate with the PN532 module over High Speed UART.

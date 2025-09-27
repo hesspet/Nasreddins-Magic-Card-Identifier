@@ -23,7 +23,7 @@ class BleKeyboardCallback final : public BleKeyboard
 public:
 	using BleKeyboard::BleKeyboard;
 
-	void setDisplayManager(DisplayManager* manager)
+	void setDisplayManager(_displayManager* manager)
 	{
 		displayManager = manager;
 
@@ -59,5 +59,5 @@ protected:
 
 private:
 	void restartAdvertisingIfNecessary();
-	DisplayManager* displayManager = nullptr;
+	_displayManager* displayManager = nullptr;
 };
