@@ -3,8 +3,8 @@
  * File: NdefHelper.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Stellt die Routinen zum Auffinden und Dekodieren von TLV- und
- *              NDEF-Inhalten bereit, inklusive Ausgabehilfen.
+ * Description: Provides routines for locating and decoding TLV and NDEF
+ *              content, including helper output utilities.
  ***************************************************************************/
 
 #include "NdefHelper.h"

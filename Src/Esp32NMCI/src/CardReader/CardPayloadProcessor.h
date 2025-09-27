@@ -3,8 +3,8 @@
  * File: CardPayloadProcessor.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Deklaration der Hilfsklasse, die Kartennutzdaten in aufbereitete
- *              Listenelemente für Anzeige und BLE-Transfer zerlegt.
+ * Description: Declares the helper class that splits card payload text into
+ *              curated list entries for display and BLE transfer.
  ***************************************************************************/
 
 #pragma once

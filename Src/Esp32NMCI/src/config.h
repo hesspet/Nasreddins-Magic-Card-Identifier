@@ -3,15 +3,15 @@
  * File: config.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Zentrale Konfigurationswerte für Pins, Geschwindigkeiten und
- *              Grenzwerte des NFC-Lesers sowie Anzeigeparameter.
+ * Description: Central configuration values for pins, speeds, NFC reader
+ *              thresholds, and display parameters.
  ***************************************************************************/
 
 #pragma once
 
 #include <stdint.h>
 
-// Splashtext
+// Splash text shown during startup
 #define VERSION_TEXT "NMCI V1.1"
 
 // Serial port used to communicate with the PN532 module over High Speed UART.
@@ -33,5 +33,5 @@ constexpr uint8_t kUidBufferMax = 10;
 constexpr uint16_t kUserMaxBytes = 1024;
 
 
-// DisplayManagerZeit in Ms bis das Display "ausgraut"
+// Duration in milliseconds before the DisplayManager dims the content
 constexpr uint32_t kDisplayManager_TimeToFadeOutDisplay = 5000U;

@@ -3,20 +3,20 @@
  * File: BleKeyboardCallback.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Deklaration einer erweiterten BLE-Tastatur, die Verbindungs-
- *              callbacks protokolliert und den Anzeigestatus aktualisiert.
+ * Description: Declares an extended BLE keyboard that logs connection
+ *              callbacks and updates the display state.
  ***************************************************************************/
 
 #pragma once
 
 #include <NimBLEDevice.h> // 2.3.6
-#include <BleKeyboard.h> // Hinweis: Manuell gepatched für NimBLE 2.3.6!
+#include <BleKeyboard.h> // Note: manually patched for NimBLE 2.3.6!
 #include "../Presentation/DisplayManager.h"
 #include "../Logger/Logger.h"
 
 
 /**
- * @brief Spezialisierte Tastaturemulation mit zusätzlichen Logmeldungen.
+ * @brief Specialized keyboard emulation that emits additional log messages.
  */
 class BleKeyboardCallback final : public BleKeyboard
 {

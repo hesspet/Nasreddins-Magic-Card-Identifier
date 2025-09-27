@@ -3,8 +3,8 @@
  * File: DisplayManager.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
- * Description: Implementiert die Darstellung von Meldungen und Overlays auf
- *              dem T-Display einschließlich BLE-Status und Fade-Out-Logik.
+ * Description: Implements message and overlay rendering on the T-Display
+ *              including BLE status handling and fade-out logic.
  ***************************************************************************/
 
 #include <Arduino.h>
@@ -68,7 +68,7 @@ void DisplayManager::renderSingleMessage(const String& message, uint16_t textCol
 {
         clearScreen();
 
-        tft.setTextDatum(MC_DATUM); // Mitte zentriert
+        tft.setTextDatum(MC_DATUM); // Centered both horizontally and vertically
         tft.setTextColor(textColor, currentBackgroundColor);
 
         const uint16_t topArea = calculateOverlayAreaHeight(OverlayPlacement::Top);
@@ -83,8 +83,8 @@ void DisplayManager::renderSingleMessage(const String& message, uint16_t textCol
         const int16_t textAreaTop = static_cast<int16_t>(topArea);
         const int16_t textAreaCenterY = textAreaTop + (textAreaHeight / 2);
 
-        // Maximale Displaygröße
-        int maxWidth = tft.width() - kTextMargin;   // etwas Rand lassen
+        // Maximum render area inside the display
+        int maxWidth = tft.width() - kTextMargin;   // keep a small margin
         int maxHeight = textAreaHeight - kTextMargin;
 
         if (maxHeight < 8)
@@ -93,16 +93,16 @@ void DisplayManager::renderSingleMessage(const String& message, uint16_t textCol
         }
 
         int bestSize = 1;
-        for (int size = 1; size <= 8; ++size) // 1 bis 7 sind vernünftig
+        for (int size = 1; size <= 8; ++size) // sizes 1 through 7 are practical
         {
                 tft.setTextSize(size);
-		int16_t w = tft.textWidth(message);
-		int16_t h = 8 * size;  // Standardhöhe der Schrift bei Größe 1 = 8px
+                int16_t w = tft.textWidth(message);
+                int16_t h = 8 * size;  // default font height at size 1 is 8 px
 
-		if (w > maxWidth || h > maxHeight)
-		{
-			break;  // letzte gültige Größe war bestSize
-		}
+                if (w > maxWidth || h > maxHeight)
+                {
+                        break;  // the previous value of bestSize remains valid
+                }
                 bestSize = size;
         }
 
@@ -393,9 +393,9 @@ void DisplayManager::redrawCachedMessage()
 }
 
 /*
-        Prüft ob die Zeit abgelaufen ist um das Display auszugrauen.
+        Checks whether it is time to dim the display content.
 
-        @see kDisplayManager_TimeToFadeOutDisplay Konfiguration des Delay bis zum Ausgrauen
+        @see kDisplayManager_TimeToFadeOutDisplay configuration for the fade-out delay
 */
 void DisplayManager::update()
 {
