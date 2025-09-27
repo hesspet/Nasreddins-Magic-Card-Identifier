@@ -34,7 +34,6 @@ public:
     }
 
 protected:
-#if defined(USE_NIMBLE)
     void onConnect(BLEServer* server, NimBLEConnInfo& connInfo) override
     {
         BleKeyboard::onConnect(server, connInfo);
@@ -57,28 +56,6 @@ protected:
         }
         restartAdvertisingIfNecessary();
     }
-#else
-    void onConnect(BLEServer* server) override
-    {
-        BleKeyboard::onConnect(server);
-        Logger::LogInfo(F("[BLE] Verbindung hergestellt."));
-        if (displayManager != nullptr)
-        {
-            displayManager->setBleConnectionState(true);
-        }
-    }
-
-    void onDisconnect(BLEServer* server) override
-    {
-        BleKeyboard::onDisconnect(server);
-        Logger::LogInfo(F("[BLE] Verbindung getrennt."));
-        if (displayManager != nullptr)
-        {
-            displayManager->setBleConnectionState(false);
-        }
-        restartAdvertisingIfNecessary();
-    }
-#endif
 
 private:
     void restartAdvertisingIfNecessary();

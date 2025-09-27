@@ -8,14 +8,10 @@
  ***************************************************************************/
 
 #include "BleKeyboardCallback.h"
-
-#if defined(USE_NIMBLE)
 #include <NimBLEAdvertising.h>
-#endif
 
 void BleKeyboardCallback::restartAdvertisingIfNecessary()
 {
-#if defined(USE_NIMBLE)
     NimBLEAdvertising* advertising = BLEDevice::getAdvertising();
 
     if (advertising == nullptr)
@@ -46,7 +42,4 @@ void BleKeyboardCallback::restartAdvertisingIfNecessary()
     {
         Logger::LogError(F("[BLE] Advertising konnte nach Trennung nicht gestartet werden."));
     }
-#else
-    // Classic BLE stack: the base module takes care of restarting advertising.
-#endif
 }
