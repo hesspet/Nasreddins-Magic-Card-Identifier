@@ -3,6 +3,8 @@
  * File: Logger.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Implementiert die Ausgabe- und Formatierungsfunktionen des
+ *              Loggers inklusive Serial-Setup und Displaybenachrichtigung.
  ***************************************************************************/
 
 #include "Logger.h"

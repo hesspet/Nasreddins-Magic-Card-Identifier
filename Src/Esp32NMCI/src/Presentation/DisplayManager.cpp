@@ -3,6 +3,8 @@
  * File: DisplayManager.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Implementiert die Darstellung von Meldungen und Overlays auf
+ *              dem T-Display einschließlich BLE-Status und Fade-Out-Logik.
  ***************************************************************************/
 
 #include <Arduino.h>

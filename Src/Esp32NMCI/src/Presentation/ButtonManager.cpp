@@ -3,6 +3,8 @@
  * File: ButtonManager.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Realisiert das zyklische Einlesen der Taster, erkennt Kurz-
+ *              und Langdrucke und triggert konfigurierte Aktionen.
  ***************************************************************************/
 
 // ButtonManager.cpp

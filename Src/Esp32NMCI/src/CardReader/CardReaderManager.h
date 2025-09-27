@@ -3,6 +3,8 @@
  * File: CardReaderManager.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Schnittstellendeklaration des Managers, der den PN532 ansteuert,
+ *              NFC-Tags verarbeitet und Nutzdaten an Callbacks weitergibt.
  ***************************************************************************/
 
 #pragma once
