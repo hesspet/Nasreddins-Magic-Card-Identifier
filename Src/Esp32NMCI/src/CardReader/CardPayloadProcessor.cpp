@@ -46,7 +46,7 @@ std::vector<String> CardPayloadProcessor::ProcessPayload(const String& payload)
 
 	if (firstLineBreak != -1)
 	{
-		Logger::logWarn(F("Payload contains multiple rows; ignoring additional lines."));
+		Logger::LogWarn(F("Payload contains multiple rows; ignoring additional lines."));
 		trimmedPayload = trimmedPayload.substring(0, firstLineBreak);
 		trimmedPayload.trim();
 
@@ -80,7 +80,7 @@ std::vector<String> CardPayloadProcessor::ProcessPayload(const String& payload)
 
 	if (start < trimmedPayload.length())
 	{
-		Logger::logWarn(F("Payload exceeded maximum element count (5); remaining values ignored."));
+		Logger::LogWarn(F("Payload exceeded maximum element count (5); remaining values ignored."));
 	}
 
 	return elements;

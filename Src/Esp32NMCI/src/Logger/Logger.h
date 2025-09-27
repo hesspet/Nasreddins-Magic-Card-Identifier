@@ -112,7 +112,7 @@ public:
 	}
 
 	template <typename T>
-	static void logInfo(const T& value, bool newline = true, int base = kNoBase)
+	static void LogInfo(const T& value, bool newline = true, int base = kNoBase)
 	{
 		log(value, newline, base, Level::Info);
 	}
@@ -140,7 +140,7 @@ public:
 	 * @endcode
 	 */
 	template <typename T>
-	static void logWarn(const T& value, bool newline = true, int base = kNoBase,
+	static void LogWarn(const T& value, bool newline = true, int base = kNoBase,
 		bool showOnDisplay = false)
 	{
 		log(value, newline, base, Level::Warn);

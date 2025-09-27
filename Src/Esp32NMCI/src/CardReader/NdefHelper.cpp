@@ -173,7 +173,7 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord& r) const
 	}
 	if (r.payloadLen < 1)
 	{
-		Logger::logInfo(F("Empty RTD/T payload"));
+		Logger::LogInfo(F("Empty RTD/T payload"));
 		return;
 	}
 
@@ -182,7 +182,7 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord& r) const
 	uint8_t langLen = (status & 0x3F);
 	if (r.payloadLen < (size_t)(1 + langLen))
 	{
-		Logger::logInfo(F("RTD/T payload too short"));
+		Logger::LogInfo(F("RTD/T payload too short"));
 		return;
 	}
 
@@ -199,7 +199,7 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord& r) const
 	Logger::LogDebug(F(", "), false);
 	Logger::LogDebug(lang, false);
 	Logger::LogDebug(F(")"));
-	Logger::logInfo(F("Text payload:"));
+	Logger::LogInfo(F("Text payload:"));
 	if (utf16)
 	{
 		const String hexDump = getString(textPtr, textLen);
@@ -218,7 +218,7 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord& r) const
 				}
 				else
 				{
-					Logger::logInfo(line);
+					Logger::LogInfo(line);
 				}
 			}
 			else
@@ -240,7 +240,7 @@ void NdefHelper::decodeAndPrintTextRecord(const NdefRecord& r) const
 		for (size_t i = 0; i < textLen; ++i)
 		{
 			char c = (char)textPtr[i];
-			Logger::logInfo(isprint((unsigned char)c) ? c : '.', false);
+			Logger::LogInfo(isprint((unsigned char)c) ? c : '.', false);
 		}
 		Logger::LogInfo();
 	}

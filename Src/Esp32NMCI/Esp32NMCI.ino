@@ -132,11 +132,11 @@ static void OnNewData(const String& payloadText)
 
 	if (_listElementsInPayloadFromCard.empty())
 	{
-		Logger::logWarn(F("Received empty card payload."));
+		Logger::LogWarn(F("Received empty card payload."));
 		return;
 	}
 
-	Logger::logInfo(F("Processed card payload values:"));
+	Logger::LogInfo(F("Processed card payload values:"));
 
 	for (size_t index = 0; index < _listElementsInPayloadFromCard.size(); ++index)
 	{
@@ -151,7 +151,7 @@ static void OnNewData(const String& payloadText)
 
 	_displayManager.showMessage(_listElementsInPayloadFromCard);
 
-	BleHelper::sendTextToKeyboard(_bleKeyboardCallbackHandler, _listElementsInPayloadFromCard.front());
+	BleHelper::SendTextToKeyboard(_bleKeyboardCallbackHandler, _listElementsInPayloadFromCard.front());
 
 }
 
@@ -164,10 +164,11 @@ void setup()
 
 	_displayManager.begin(DisplayManager::Orientation::UsbLeft);
 	Logger::setDisplayManager(&_displayManager);
-
+	
 	_bleKeyboardCallbackHandler.setDisplayManager(&_displayManager);
 
-	_cardReaderManager.begin(OnNewData);
+	_cardReaderManager.setNewDataCallback(OnNewData);
+	_cardReaderManager.begin();
 	_buttonManager.begin();
 	_buttonManager.setOnButton35LongPressed(SystemHelper::EnterDeepSleep);
 

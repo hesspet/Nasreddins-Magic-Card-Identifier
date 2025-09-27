@@ -24,5 +24,5 @@ public:
 	 * @param keyboard BLE keyboard instance used to transmit the text.
 	 * @param text UTF-8 encoded content to transmit.
 	 */
-	static void sendTextToKeyboard(BleKeyboardCallback& keyboard, const String& text);
+	static void SendTextToKeyboard(BleKeyboardCallback& keyboard, const String& text);
 };

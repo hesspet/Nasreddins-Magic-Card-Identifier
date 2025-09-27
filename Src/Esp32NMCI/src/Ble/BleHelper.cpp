@@ -11,7 +11,7 @@
 #include "src/Ble/BleKeyboardCallback.h"
 #include "src/Logger/Logger.h"
 
-void BleHelper::sendTextToKeyboard(BleKeyboardCallback& keyboard, const String& text)
+void BleHelper::SendTextToKeyboard(BleKeyboardCallback& keyboard, const String& text)
 {
 	if (text.length() == 0)
 	{
@@ -20,7 +20,7 @@ void BleHelper::sendTextToKeyboard(BleKeyboardCallback& keyboard, const String& 
 
 	if (!keyboard.isConnected())
 	{
-		Logger::logWarn(F("BLE keyboard not connected; skipping payload transfer."));
+		Logger::LogWarn(F("BLE keyboard not connected; skipping payload transfer."));
 		return;
 	}
 
