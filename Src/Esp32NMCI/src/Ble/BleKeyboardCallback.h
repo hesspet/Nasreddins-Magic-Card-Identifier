@@ -37,7 +37,7 @@ protected:
 	void onConnect(BLEServer* server, NimBLEConnInfo& connInfo) override
 	{
 		BleKeyboard::onConnect(server, connInfo);
-		Logger::LogInfo(F("[BLE] Connection established."));
+		Logger::logInfo(F("[BLE] Connection established."));
 		if (displayManager != nullptr)
 		{
 			displayManager->setBleConnectionState(true);
