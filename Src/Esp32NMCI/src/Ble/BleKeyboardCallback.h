@@ -37,7 +37,7 @@ protected:
     void onConnect(BLEServer* server, NimBLEConnInfo& connInfo) override
     {
         BleKeyboard::onConnect(server, connInfo);
-        Logger::LogInfo(F("[BLE] Verbindung hergestellt."));
+        Logger::LogInfo(F("[BLE] Connection established."));
         if (displayManager != nullptr)
         {
             displayManager->setBleConnectionState(true);
@@ -48,7 +48,7 @@ protected:
     {
         BleKeyboard::onDisconnect(server, connInfo, reason);
         Logger::logf(Logger::Level::Info,
-            "[BLE] Verbindung getrennt (Grund: %d).\n",
+            "[BLE] Disconnected (reason: %d).\n",
             reason);
         if (displayManager != nullptr)
         {

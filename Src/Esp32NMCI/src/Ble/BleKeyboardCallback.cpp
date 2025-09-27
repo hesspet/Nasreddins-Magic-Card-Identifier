@@ -16,30 +16,30 @@ void BleKeyboardCallback::restartAdvertisingIfNecessary()
 
     if (advertising == nullptr)
     {
-        Logger::LogWarn(F("[BLE] Kein Advertising-Objekt verfügbar; versuche Neustart."));
+        Logger::LogWarn(F("[BLE] No advertising object available; attempting restart."));
         if (BLEDevice::startAdvertising())
         {
-            Logger::LogInfo(F("[BLE] Advertising im Fallback erfolgreich gestartet."));
+            Logger::LogInfo(F("[BLE] Advertising started successfully using fallback."));
         }
         else
         {
-            Logger::LogError(F("[BLE] Advertising konnte im Fallback nicht gestartet werden."));
+            Logger::LogError(F("[BLE] Failed to start advertising using fallback."));
         }
         return;
     }
 
     if (advertising->isAdvertising())
     {
-        Logger::LogDebug(F("[BLE] Advertising läuft bereits; kein Neustart erforderlich."));
+        Logger::LogDebug(F("[BLE] Advertising already running; no restart required."));
         return;
     }
 
     if (advertising->start())
     {
-        Logger::LogInfo(F("[BLE] Advertising nach Trennung neu gestartet."));
+        Logger::LogInfo(F("[BLE] Advertising restarted after disconnection."));
     }
     else
     {
-        Logger::LogError(F("[BLE] Advertising konnte nach Trennung nicht gestartet werden."));
+        Logger::LogError(F("[BLE] Failed to restart advertising after disconnection."));
     }
 }

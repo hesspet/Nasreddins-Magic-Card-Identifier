@@ -202,7 +202,7 @@ void setup()
 	buttonManager.setOnButton35LongPressed(EnterDeepSleep);
 
 	Serial.println();
-	Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) – Boot-Protocol-First"));
+        Serial.println(F("[BOOT] ESP32 BLE-HID Keyboard (DE) - Boot-Protocol-First"));
 	gbleKeyboard.begin();
 }
 
@@ -217,14 +217,14 @@ void loop()
 
 		if (!gbleKeyboard.isConnected())
 		{
-			if (b <= 0x7F)
-			{
-				Serial.printf("[WARN] Nicht verbunden: '%c' (0x%02X)\n", static_cast<char>(b), static_cast<unsigned>(b));
-			}
-			else
-			{
-				Serial.printf("[WARN] Nicht verbunden: U+%04lX\n", static_cast<unsigned long>(b));
-			}
+                        if (b <= 0x7F)
+                        {
+                                Serial.printf("[WARN] Not connected: '%c' (0x%02X)\n", static_cast<char>(b), static_cast<unsigned>(b));
+                        }
+                        else
+                        {
+                                Serial.printf("[WARN] Not connected: U+%04lX\n", static_cast<unsigned long>(b));
+                        }
 			continue;
 		}
 		gbleKeyboard.print(b);
