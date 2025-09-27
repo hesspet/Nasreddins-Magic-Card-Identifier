@@ -26,10 +26,15 @@ void CardReaderManager::setNewDataCallback(NewDataCallback callback)
 	newDataCallback_ = callback;
 }
 
-void CardReaderManager::begin()
+void CardReaderManager::begin(NewDataCallback callback)
 {
-	PN532_HSU_PORT.begin(PN532_HSU_BAUDRATE, SERIAL_8N1, PN532_HSU_RX_PIN, PN532_HSU_TX_PIN);
-	nfc_.begin();
+        if (callback != nullptr)
+        {
+                setNewDataCallback(callback);
+        }
+
+        PN532_HSU_PORT.begin(PN532_HSU_BAUDRATE, SERIAL_8N1, PN532_HSU_RX_PIN, PN532_HSU_TX_PIN);
+        nfc_.begin();
 
 	uint32_t versiondata = nfc_.getFirmwareVersion();
 	if (!versiondata)

@@ -24,7 +24,7 @@ public:
 
 	CardReaderManager(PN532& nfc, Type2TagReader& tagReader, NdefHelper& ndefHelper);
 
-	void begin();
+        void begin(NewDataCallback callback = nullptr);
 	void process();
 
 	void setNewDataCallback(NewDataCallback callback);
