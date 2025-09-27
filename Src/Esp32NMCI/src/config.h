@@ -3,6 +3,8 @@
  * File: config.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Zentrale Konfigurationswerte für Pins, Geschwindigkeiten und
+ *              Grenzwerte des NFC-Lesers sowie Anzeigeparameter.
  ***************************************************************************/
 
 #pragma once

@@ -3,6 +3,8 @@
  * File: BleKeyboardCallback.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Implementiert die Logik zum Neustarten des BLE-Advertisings
+ *              nach Verbindungsabbrüchen und ergänzt Diagnoseausgaben.
  ***************************************************************************/
 
 #include "BleKeyboardCallback.h"

@@ -3,6 +3,8 @@
  * File: Type2TagReader.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Implementiert das Auslesen von Capability-Container und
+ *              Nutzspeicher der Type-2-Tags über den PN532.
  ***************************************************************************/
 
 #include "Type2TagReader.h"

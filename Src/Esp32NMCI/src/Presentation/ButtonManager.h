@@ -3,6 +3,8 @@
  * File: ButtonManager.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Deklariert die Verwaltung der physischen Taster inklusive
+ *              Entprellung, Zustandsabfrage und Callback-Zuweisung.
  ***************************************************************************/
 
 #pragma once

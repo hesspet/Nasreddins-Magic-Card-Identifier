@@ -3,6 +3,8 @@
  * File: DisplayManager.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Deklariert die Ansteuerung des T-Display-Displays inklusive
+ *              Overlayverwaltung, BLE-Statusanzeige und Nachrichtencache.
  ***************************************************************************/
 
 #pragma once

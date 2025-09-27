@@ -3,6 +3,9 @@
  * File: Esp32NMCI.ino
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Hauptsketch, der Display, Taster, BLE-Tastatur und NFC-Leser
+ *              initialisiert und die komplette Kartenverarbeitungslogik
+ *              orchestriert.
  ***************************************************************************/
 
 /**************************************************************************/

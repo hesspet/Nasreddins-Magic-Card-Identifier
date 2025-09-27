@@ -3,6 +3,8 @@
  * File: BleKeyboardCallback.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Deklaration einer erweiterten BLE-Tastatur, die Verbindungs-
+ *              callbacks protokolliert und den Anzeigestatus aktualisiert.
  ***************************************************************************/
 
 #pragma once

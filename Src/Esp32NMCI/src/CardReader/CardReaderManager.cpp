@@ -3,6 +3,8 @@
  * File: CardReaderManager.cpp
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Enthält die Laufzeitlogik zur Initialisierung des PN532, zum
+ *              Erfassen von Type-2-Tags und zum Weiterreichen der NDEF-Daten.
  ***************************************************************************/
 
 #include "CardReaderManager.h"

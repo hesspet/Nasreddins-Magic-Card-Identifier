@@ -3,6 +3,8 @@
  * File: Type2TagReader.h
  * Repository: https://github.com/hesspet/NasrredinsMagicCardIdentifier
  * Author: Peter Heß, Büdingen DE
+ * Description: Deklaration eines Readers für MIFARE-Type-2-Tags inklusive
+ *              Auslesen des Capability Containers und des Nutzspeichers.
  ***************************************************************************/
 
 #pragma once
