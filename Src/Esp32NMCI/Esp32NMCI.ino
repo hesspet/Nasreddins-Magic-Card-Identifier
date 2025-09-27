@@ -167,8 +167,7 @@ void setup()
 	
 	_bleKeyboardCallbackHandler.setDisplayManager(&_displayManager);
 
-	_cardReaderManager.setNewDataCallback(OnNewData);
-	_cardReaderManager.begin();
+        _cardReaderManager.begin(OnNewData);
 	_buttonManager.begin();
 	_buttonManager.setOnButton35LongPressed(SystemHelper::EnterDeepSleep);
 
