@@ -2,21 +2,23 @@
 
 Eine RFID Variante um bei Zauberroutinen Gegenstände via RFID Technik zu identifizieren
 
-Man nehme ein RFUD Breakout Board, hänge ein ESP32 dran und verstecke RFID Aufkleber zwischen Spielkarten und schon hat man ein Gerät mit dem man die verschiedensten Zauberroutinen entwicklen kann.
+Man nehme ein RFID Breakout Board, hänge ein ESP32-Board dran und verstecke RFID Chips zwischen Spielkarten und schon hat man ein Gerät mit dem man die verschiedensten Zauberroutinen entwicklen kann.
 
-Der erste Prototyp ist fertig und Spielkarten, in diesem Fall Tarot Karten, sind bereits angefertigt.
+Der erste Prototyp ist fertig und Spielkarten, in diesem Fall Tarot Karten, sind bereits angefertigt und das Ganze ist nun in Foren publiziert.
 
-# ESP32 Plattform Prototype
+# ESP32 Plattform 
 
 * Lillygo T-Display
   * Integriertes Display
   * Preisgünstig
   * Autonomer Betrieb mit Akku
   * Bauform eignet sich ganz gut um direkt hinter den RFID Leser montiert zu werden
+ 
+ Hinweis: Natürlich sind wir nicht speziell auf das T-Display festgelegt. Im Prinzip sollte die Idee mit jedem normalen ESP Board mit einer Akkuladefunktion umgesetzt werden können. Je kleiner um so besser. In der Entwicklungsphase hat sich das T-Display aber als sehr hilfreich erwiesen, da man natürlich direkt auf dem Display Informationen ausgeben kann.
 
 # Der RFID Leser
 
-Gefunden bei Amazon: https://www.amazon.de/dp/B0B1QB4347?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1 (Aideepen 2 Stück PN532 NFC NXP RFID-Modul V3 Kit Reader Nahfeldkommunikationsleser-Modul-Kit I2C SPI HSU) Günstig, sieht vielversprechend aus.
+Gefunden bei Amazon: https://www.amazon.de/dp/B0B1QB4347?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1 (Aideepen 2 Stück PN532 NFC NXP RFID-Modul V3 Kit Reader Nahfeldkommunikationsleser-Modul-Kit I2C SPI HSU). Funktioniert hervorragend und ich konnte den Leser innerhalb kürzester Zeit zum Laufen bringen.
 
 * Datasheet
 * Weitere Infos
