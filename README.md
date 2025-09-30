@@ -36,20 +36,22 @@ https://youtu.be/G3h274TyvUc - Beispiel wie man es vorführen kann. Bauhinweise 
 
 * ERLEDIGT - ~Projekt anlegen~
 * ERLEDIGT - ~Hardware anbinden (Modus klären, I2C oder HSU)~
-  * ERLEDIGT - Anbindung in der einfachsten Version via HSU (High Speed UART)
-* Einfache Tests Lesen (ggf. Schreiben) der Karte
+  * ERLEDIGT - ~Anbindung in der einfachsten Version via HSU (High Speed UART)~
+* ~Einfache Tests Lesen (ggf. Schreiben) der Karte~
   * ERLEDIGT ~Arduino Library auswählen~
-    * Adafruit_PN532
-      *  https://adafruit-pn532.readthedocs.io/en/latest/
-      *  https://github.com/adafruit/Adafruit-PN532
-      * Header mit allen Funktionen: https://github.com/adafruit/Adafruit-PN532/blob/master/Adafruit_PN532.h
-* ERLEDIGT Projektkonzept weiter ausarbeiten
-  * ERLEDIGT Einfaches Kunststück
-    * ERLEDIGT Lesen auf Chip, anzeige z.B. in T-Display
-* ERLEDIGT Weitere Ideen
-  * ERLEDIGT Anbindung an Smarthone als Tastaturemulation
+    * ~Adafruit_PN532~
+      *  ~https://adafruit-pn532.readthedocs.io/en/latest/~
+      *  ~https://github.com/adafruit/Adafruit-PN532~
+      * ~Header mit allen Funktionen: https://github.com/adafruit/Adafruit-PN532/blob/master/Adafruit_PN532.h~
+* ERLEDIGT ~Projektkonzept weiter ausarbeiten~
+  * ERLEDIGT ~Einfaches Kunststück~
+    * ERLEDIGT ~Lesen auf Chip, anzeige z.B. in T-Display~
+* ERLEDIGT ~Weitere Ideen~
+  * ERLEDIGT ~Anbindung an Smarthone als Tastaturemulation~
    
 # Weitere Infos im WIKI
+
+Da das alles hier zu viel wird, bitte schaut Euch im WIKI um!
 
 https://github.com/hesspet/NasrredinsMagicCardIdentifier/wiki
 
