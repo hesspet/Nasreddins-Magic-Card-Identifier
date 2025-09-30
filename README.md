@@ -4,7 +4,7 @@ Eine RFID Variante um bei Zauberroutinen Gegenstände via RFID Technik zu identi
 
 Man nehme ein RFUD Breakout Board, hänge ein ESP32 dran und verstecke RFID Aufkleber zwischen Spielkarten und schon hat man ein Gerät mit dem man die verschiedensten Zauberroutinen entwicklen kann.
 
-Dieses Projekt ist noch in er Planung. Erste Gerätschaften sind besorgt. Und Spielkarten, in diesem Fall Tarot Karten, sind bereits angefertigt.
+Der erste Prototyp ist fertig und Spielkarten, in diesem Fall Tarot Karten, sind bereits angefertigt.
 
 # ESP32 Plattform Prototype
 
@@ -26,27 +26,27 @@ Gefunden bei Amazon: https://www.amazon.de/dp/B0B1QB4347?ref=ppx_yo2ov_dt_b_fed_
 
 * <img src="Images/NMCI_NFC_MODULE_V3_ELECHOUSE_Oberseite.png" alt="Breakout Oberseite" width="400"> <img src="Images/NMCI_NFC_MODULE_V3_ELECHOUSE_Unterseite.png" alt="Breakout Unterseite" width="400">
 * Der erste Prototype auf Breadboard: https://youtu.be/oPGHHWMIs64
+
+## Video
+
+https://youtu.be/G3h274TyvUc - Beispiel wie man es vorführen kann. Bauhinweise und was mir sonst noch so eingefallen ist.
    
 # Roadmap
 
 * ERLEDIGT - ~Projekt anlegen~
 * ERLEDIGT - ~Hardware anbinden (Modus klären, I2C oder HSU)~
-  * Anbindung in der einfachsten Version via HSU (High Speed UART)
-
+  * ERLEDIGT - Anbindung in der einfachsten Version via HSU (High Speed UART)
 * Einfache Tests Lesen (ggf. Schreiben) der Karte
   * ERLEDIGT ~Arduino Library auswählen~
     * Adafruit_PN532
       *  https://adafruit-pn532.readthedocs.io/en/latest/
       *  https://github.com/adafruit/Adafruit-PN532
       * Header mit allen Funktionen: https://github.com/adafruit/Adafruit-PN532/blob/master/Adafruit_PN532.h
-* Projektkonzept weiter ausarbeiten
-  * Einfaches Kunststück
-    * Lesen auf Chip, anzeige z.B. in T-Display
-* Weitere Ideen
-  * Anbindung an Smarthone
-    * als PWA  mit IP
-    * MAUI mit Bluetooth BLE
-    * ???
+* ERLEDIGT Projektkonzept weiter ausarbeiten
+  * ERLEDIGT Einfaches Kunststück
+    * ERLEDIGT Lesen auf Chip, anzeige z.B. in T-Display
+* ERLEDIGT Weitere Ideen
+  * ERLEDIGT Anbindung an Smarthone als Tastaturemulation
    
 # Weitere Infos im WIKI
 
