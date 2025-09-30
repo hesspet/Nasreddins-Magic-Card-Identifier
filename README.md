@@ -16,11 +16,11 @@ Der erste Prototyp ist fertig und Spielkarten, in diesem Fall Tarot Karten, sind
  
  Hinweis: Natürlich sind wir nicht speziell auf das T-Display festgelegt. Im Prinzip sollte die Idee mit jedem normalen ESP Board mit einer Akkuladefunktion umgesetzt werden können. Je kleiner um so besser. In der Entwicklungsphase hat sich das T-Display aber als sehr hilfreich erwiesen, da man natürlich direkt auf dem Display Informationen ausgeben kann.
 
-# Der RFID Leser
+# Der RFID Leser (PN532)
 
 Gefunden bei Amazon: https://www.amazon.de/dp/B0B1QB4347?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1 (Aideepen 2 Stück PN532 NFC NXP RFID-Modul V3 Kit Reader Nahfeldkommunikationsleser-Modul-Kit I2C SPI HSU). Funktioniert hervorragend und ich konnte den Leser innerhalb kürzester Zeit zum Laufen bringen.
 
-* Datasheet
+* Datasheet und weitere Infos findet Ihr unter: https://github.com/hesspet/Nasreddins-Magic-Card-Identifier/tree/main/Datasheets
 * Weitere Infos
 * Arduino Lib
 
