@@ -1,64 +1,64 @@
 # Nasreddins Magic Card Identifier
 
-Eine RFID Variante um bei Zauberroutinen Gegenstände via RFID Technik zu identifizieren
+An RFID-based approach to identify objects via RFID technology for magic routines.
 
-Man nehme ein RFID Breakout Board, hänge ein ESP32-Board dran und verstecke RFID Chips zwischen Spielkarten und schon hat man ein Gerät mit dem man die verschiedensten Zauberroutinen entwicklen kann.
+Take an RFID breakout board, connect an ESP32 board, hide RFID chips between playing cards, and you have a device with which you can develop all kinds of magic routines.
 
-Der erste Prototyp ist fertig und Spielkarten, in diesem Fall Tarot Karten, sind bereits angefertigt und das Ganze ist nun in Foren publiziert.
+The first prototype is finished, playing cards—Tarot cards in this case—have already been prepared, and the whole project has now been published in forums.
 
-# ESP32 Plattform 
+# ESP32 Platform
 
 * Lillygo T-Display
-  * Integriertes Display
-  * Preisgünstig
-  * Autonomer Betrieb mit Akku
-  * Bauform eignet sich ganz gut um direkt hinter den RFID Leser montiert zu werden
- 
- Hinweis: Natürlich sind wir nicht speziell auf das T-Display festgelegt. Im Prinzip sollte die Idee mit jedem normalen ESP Board mit einer Akkuladefunktion umgesetzt werden können. Je kleiner um so besser. In der Entwicklungsphase hat sich das T-Display aber als sehr hilfreich erwiesen, da man natürlich direkt auf dem Display Informationen ausgeben kann.
+  * Integrated display
+  * Inexpensive
+  * Autonomous operation with a battery
+  * Form factor is well suited to be mounted directly behind the RFID reader
 
-# Der RFID Leser (PN532)
+  Note: Of course, we are not specifically tied to the T-Display. In principle, the idea should work with any standard ESP board that includes a battery charging function. The smaller, the better. During development the T-Display proved very helpful, because you can output information directly on the display.
 
-Gefunden bei Amazon: https://www.amazon.de/dp/B0B1QB4347?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1 (Aideepen 2 Stück PN532 NFC NXP RFID-Modul V3 Kit Reader Nahfeldkommunikationsleser-Modul-Kit I2C SPI HSU). Funktioniert hervorragend und ich konnte den Leser innerhalb kürzester Zeit zum Laufen bringen.
+# The RFID Reader (PN532)
 
-* Datasheet und weitere Infos findet Ihr unter: https://github.com/hesspet/Nasreddins-Magic-Card-Identifier/tree/main/Datasheets
-* Weitere Infos unter: https://github.com/hesspet/Nasreddins-Magic-Card-Identifier/wiki/PN532-Readings
+Found on Amazon: https://www.amazon.de/dp/B0B1QB4347?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1 (Aideepen 2 pieces PN532 NFC NXP RFID Module V3 Kit Reader Near Field Communication Reader Module Kit I2C SPI HSU). Works excellently, and I was able to get the reader running in no time.
 
-## Bilder
+* Datasheet and more information can be found at: https://github.com/hesspet/Nasreddins-Magic-Card-Identifier/tree/main/Datasheets
+* Additional information: https://github.com/hesspet/Nasreddins-Magic-Card-Identifier/wiki/PN532-Readings
 
-* <img src="Images/NMCI_NFC_MODULE_V3_ELECHOUSE_Oberseite.png" alt="Breakout Oberseite" width="400"> <img src="Images/NMCI_NFC_MODULE_V3_ELECHOUSE_Unterseite.png" alt="Breakout Unterseite" width="400">
-* Der erste Prototype auf Breadboard: https://youtu.be/oPGHHWMIs64
+## Images
+
+* <img src="Images/NMCI_NFC_MODULE_V3_ELECHOUSE_Oberseite.png" alt="Breakout top" width="400"> <img src="Images/NMCI_NFC_MODULE_V3_ELECHOUSE_Unterseite.png" alt="Breakout bottom" width="400">
+* The first prototype on a breadboard: https://youtu.be/oPGHHWMIs64
 
 ## Video
 
-https://youtu.be/G3h274TyvUc - Beispiel wie man es vorführen kann. Bauhinweise und was mir sonst noch so eingefallen ist.
-   
+https://youtu.be/G3h274TyvUc - Example of how it can be demonstrated. Construction notes and everything else that came to mind.
+
 # Roadmap
 
-* ERLEDIGT - ~Projekt anlegen~
-* ERLEDIGT - ~Hardware anbinden (Modus klären, I2C oder HSU)~
-  * ERLEDIGT - ~Anbindung in der einfachsten Version via HSU (High Speed UART)~
-* ~Einfache Tests Lesen (ggf. Schreiben) der Karte~
-  * ERLEDIGT ~Arduino Library auswählen~
+* DONE - ~Create project~
+* DONE - ~Connect hardware (determine mode, I2C or HSU)~
+  * DONE - ~Connect in the simplest version via HSU (High Speed UART)~
+* ~Simple tests for reading (possibly writing) the card~
+  * DONE ~Select Arduino library~
     * ~Adafruit_PN532~
       *  ~https://adafruit-pn532.readthedocs.io/en/latest/~
       *  ~https://github.com/adafruit/Adafruit-PN532~
-      * ~Header mit allen Funktionen: https://github.com/adafruit/Adafruit-PN532/blob/master/Adafruit_PN532.h~
-* ERLEDIGT ~Projektkonzept weiter ausarbeiten~
-  * ERLEDIGT ~Einfaches Kunststück~
-    * ERLEDIGT ~Lesen auf Chip, anzeige z.B. in T-Display~
-* ERLEDIGT ~Weitere Ideen~
-  * ERLEDIGT ~Anbindung an Smarthone als Tastaturemulation~
-   
-# Weitere Infos im WIKI
+      * ~Header with all functions: https://github.com/adafruit/Adafruit-PN532/blob/master/Adafruit_PN532.h~
+* DONE ~Further develop the project concept~
+  * DONE ~Simple trick~
+    * DONE ~Read from chip, display e.g. on T-Display~
+* DONE ~Additional ideas~
+  * DONE ~Connect to smartphone as a keyboard emulation~
 
-Da das alles hier zu viel wird, bitte schaut Euch im WIKI um!
+# More Information in the WIKI
+
+Since everything would be too much here, please take a look at the WIKI!
 
 https://github.com/hesspet/NasrredinsMagicCardIdentifier/wiki
 
-# Quellen:
+# Sources:
 
-* Projektintern, Kopien von Datasheets: https://github.com/hesspet/NasrredinsMagicCardIdentifier/tree/main/Datasheets
-* https://www.espboards.dev/sensors/pn532/ ESP32 PN532 NFC Module Pinout, Wiring, ESP32 and more - Gute Übersicht über das Modul. Speziell in Richtung ESP32 gedacht.
-* https://www.elechouse.com der Hersteller des Breakoutboards (PS: Bei dem Board von Amazon dürfte es sich um einen Clone handeln, die her gezeigten Boards sehen doch etwas anders aus: https://www.elechouse.com/product-category/communication-shield/rfid/)
-* Eine etwas kürzere Dokumentation des Breakoutboards: https://components101.com/wireless/pn532-nfc-rfid-module
-* Tasmota hat eine direkte Einbindung: https://tasmota.github.io/docs/PN532/ (Ist hier nicht projektrelevant, aber vielleicht kann man sich da die eine oder andere Idee mal anschauen.)
+* Internal project copies of datasheets: https://github.com/hesspet/NasrredinsMagicCardIdentifier/tree/main/Datasheets
+* https://www.espboards.dev/sensors/pn532/ ESP32 PN532 NFC Module Pinout, Wiring, ESP32 and more - Good overview of the module. Especially aimed at the ESP32.
+* https://www.elechouse.com the manufacturer of the breakout board (PS: The board from Amazon is probably a clone, the boards shown there look slightly different: https://www.elechouse.com/product-category/communication-shield/rfid/)
+* A somewhat shorter documentation of the breakout board: https://components101.com/wireless/pn532-nfc-rfid-module
+* Tasmota has direct integration: https://tasmota.github.io/docs/PN532/ (Not relevant to this project, but maybe you can find one or two ideas there.)
