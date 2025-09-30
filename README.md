@@ -21,8 +21,7 @@ Der erste Prototyp ist fertig und Spielkarten, in diesem Fall Tarot Karten, sind
 Gefunden bei Amazon: https://www.amazon.de/dp/B0B1QB4347?ref=ppx_yo2ov_dt_b_fed_asin_title&th=1 (Aideepen 2 Stück PN532 NFC NXP RFID-Modul V3 Kit Reader Nahfeldkommunikationsleser-Modul-Kit I2C SPI HSU). Funktioniert hervorragend und ich konnte den Leser innerhalb kürzester Zeit zum Laufen bringen.
 
 * Datasheet und weitere Infos findet Ihr unter: https://github.com/hesspet/Nasreddins-Magic-Card-Identifier/tree/main/Datasheets
-* Weitere Infos
-* Arduino Lib
+* Weitere Infos unter: https://github.com/hesspet/Nasreddins-Magic-Card-Identifier/wiki/PN532-Readings
 
 ## Bilder
 
