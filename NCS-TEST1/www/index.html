@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nasreddins Camera Server</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="container">
+        <header>
+            <h1>Nasreddins Camera Server</h1>
+            <p>Die Kamera wird automatisch geöffnet und ein Foto erstellt.</p>
+        </header>
+        <section class="preview" aria-live="polite">
+            <video id="cameraPreview" playsinline muted></video>
+            <img id="capturedImage" alt="Aufgenommenes Foto" hidden>
+        </section>
+        <section class="controls">
+            <button id="retakeButton" type="button" hidden>Neues Foto aufnehmen</button>
+        </section>
+        <section class="status" aria-live="assertive">
+            <p id="statusMessage">Starte Kamera…</p>
+        </section>
+    </main>
+    <script src="app.js" type="module"></script>
+</body>
+</html>
