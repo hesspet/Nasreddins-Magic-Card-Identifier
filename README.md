@@ -62,3 +62,15 @@ https://github.com/hesspet/NasrredinsMagicCardIdentifier/wiki
 * https://www.elechouse.com the manufacturer of the breakout board (PS: The board from Amazon is probably a clone, the boards shown there look slightly different: https://www.elechouse.com/product-category/communication-shield/rfid/)
 * A somewhat shorter documentation of the breakout board: https://components101.com/wireless/pn532-nfc-rfid-module
 * Tasmota has direct integration: https://tasmota.github.io/docs/PN532/ (Not relevant to this project, but maybe you can find one or two ideas there.)
+
+## Netzwerkfähige Kamera-Webanwendung
+
+Im Ordner `NCS-TEST1` befindet sich jetzt eine kleine Node.js-Anwendung, die eine Weboberfläche bereitstellt. Diese öffnet auf kompatiblen Smartphones sofort die eingebaute Kamera, nimmt automatisch ein Foto auf und zeigt es anschließend an. Über den Button „Neues Foto aufnehmen“ kann der Vorgang wiederholt werden.
+
+### Starten
+
+1. Abhängigkeiten installieren (`npm install` im Verzeichnis `NCS-TEST1`).
+2. Server starten (`npm start`).
+3. Die Anwendung ist anschließend über `http://<IP-des-Servers>:3000` im gesamten lokalen Netzwerk erreichbar.
+
+Die Kamera-Nutzung erfolgt über die Browser-API `navigator.mediaDevices.getUserMedia`. Für mobile Geräte wird automatisch die Rückkamera (`facingMode: environment`) angefragt.

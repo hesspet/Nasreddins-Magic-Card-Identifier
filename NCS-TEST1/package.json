@@ -1,0 +1,13 @@
+{
+  "name": "nasreddins-camera-server",
+  "version": "1.0.0",
+  "description": "Einfacher Express-Server, der eine Kamera-Webanwendung ausliefert.",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "PORT=3000 node server.js"
+  },
+  "dependencies": {
+    "express": "^4.19.2"
+  }
+}
