@@ -28,9 +28,6 @@ Found on Amazon: https://www.amazon.de/dp/B0B1QB4347?ref=ppx_yo2ov_dt_b_fed_asin
 * <img src="Images/NMCI_NFC_MODULE_V3_ELECHOUSE_Oberseite.png" alt="Breakout top" width="400"> <img src="Images/NMCI_NFC_MODULE_V3_ELECHOUSE_Unterseite.png" alt="Breakout bottom" width="400">
 * The first prototype on a breadboard: https://youtu.be/oPGHHWMIs64
 
-## Video
-
-https://youtu.be/G3h274TyvUc - Example of how it can be demonstrated. Construction notes and everything else that came to mind.
 
 # Roadmap
 
