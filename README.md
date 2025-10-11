@@ -1,5 +1,7 @@
 # Nasreddins Magic Card Identifier
 
+A usb keyboard emulation - using RFID to hide keypresses.
+
 An RFID-based approach to identify objects via RFID technology for magic routines. It emulates a keyboard via Bluetooth LE. Keyvalues are stored on RFID Chip and send as Keypress to a smartphone and can be used in several magic applications.
 
 Take an RFID breakout board, connect an ESP32 board, hide RFID chips between playing cards, and you have a device with which you can develop all kinds of magic routines.
