@@ -54,6 +54,8 @@ Since everything would be too much here, please take a look at the WIKI!
 
 https://github.com/hesspet/NasrredinsMagicCardIdentifier/wiki
 
+I post sometimes a link to this page in forums with magicians. Here's some more hints: https://github.com/hesspet/Nasreddins-Magic-Card-Identifier/wiki/Magic-Tipps-and-Tricks-(Conjouring)
+
 # Sources:
 
 * Internal project copies of datasheets: https://github.com/hesspet/NasrredinsMagicCardIdentifier/tree/main/Datasheets
